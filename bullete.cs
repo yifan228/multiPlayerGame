@@ -5,20 +5,23 @@ using Photon.Pun;
 
 public class bullete : MonoBehaviourPun
 {
-    public float destroyTime =3f;
-    public float damage = 0.3f;
+    public float destroyTime =5f;
+    public float damage = 0.15f;
+
     
     
     IEnumerator destroyBullete()
     {
         yield return new WaitForSeconds(destroyTime);
-        this.GetComponent<PhotonView>().RPC("Destroy", RpcTarget.AllBuffered);
+        Debug.Log("timeToDes");
+        photonView.RPC("Destroy", RpcTarget.AllBuffered);
     }
 
     [PunRPC]
     void Destroy()
     {
         Destroy(this.gameObject);
+   
         Debug.Log("dest");
     }
 
@@ -28,17 +31,26 @@ public class bullete : MonoBehaviourPun
         {
             return;
         }
+        else 
+        {
+            Debug.Log("haha");
+        }
 
         PhotonView target = collision.gameObject.GetComponent<PhotonView>();
-        if(target!=null&&(!target.IsMine||target.IsSceneView))
+        if (target != null)
         {
-            if (target.tag =="Player")
+            if (target.tag == "Player" && (!target.IsMine))
             {
-                target.RPC("HealthUpdate", RpcTarget.AllBuffered,damage);
+                target.RPC("HealthUpdate", RpcTarget.AllBuffered, damage);
+                photonView.RPC("Destroy", RpcTarget.AllBuffered);
             }
-
-            photonView.RPC("Destroy", RpcTarget.AllBuffered);
+            else
+            {
+                Debug.Log("notmine");
+                return;
+            }
         }
+        
     }
     public void coloring()
     {
@@ -46,6 +58,11 @@ public class bullete : MonoBehaviourPun
         {
             gameObject.GetComponent<SpriteRenderer>().color = new Color(256, 0, 0);
         }
+    }
+
+    private void Start()
+    {
+       StartCoroutine(destroyBullete());
     }
     private void Update()
     {

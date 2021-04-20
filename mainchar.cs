@@ -11,6 +11,8 @@ public class mainchar : MonoBehaviourPun
     public BoxCollider2D boxcollider2D;
     public SpriteRenderer mainchaRSprite;
 
+    public static mainchar instance;
+
     public PhotonView photonView;
 
     public Text playerName;
@@ -20,14 +22,18 @@ public class mainchar : MonoBehaviourPun
 
     public LayerMask platformlayerMask;
 
-    public float Hp;
+    //public float Hp;
+
+    public bool DisableInputs = false;
 
     private void Awake()
     {
         if (photonView.IsMine)
         {
+            GameManager.instance.localPlayer = this.gameObject;
             playerName.text = PhotonNetwork.NickName;
             playerCam.SetActive(true);
+
         }
         else
         {
@@ -39,7 +45,7 @@ public class mainchar : MonoBehaviourPun
     // Update is called once per frame
     void Update()
     {
-        if (photonView.IsMine)
+        if (photonView.IsMine && DisableInputs==false)
         {
             checkInputs();
             
