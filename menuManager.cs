@@ -9,30 +9,18 @@ public class menuManager : MonoBehaviourPunCallbacks
 {
     public static menuManager instance;
 
-    [SerializeField]
-    private GameObject nameSpace, roomSpace;
-    [SerializeField]
-    private GameObject CRBtn,JRBtn,NBtn;
-    [SerializeField]
-    private InputField createRoomIF,joinRoomIF,nameIF;
+    [SerializeField]private GameObject nameSpace, roomSpace;
+
+    [SerializeField]private GameObject CRBtn, JRBtn, NBtn;
+    
+    [SerializeField] private InputField createRoomIF,joinRoomIF,nameIF;
 
 
     private void Awake()
     {
-        if(instance!=null && instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-    }
-    private void Start()
-    {
         PhotonNetwork.ConnectUsingSettings();
     }
+   
 
     public override void OnConnectedToMaster()
     {

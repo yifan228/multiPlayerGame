@@ -8,12 +8,11 @@ public class bullete : MonoBehaviourPun
     public float destroyTime =5f;
     public float damage = 0.15f;
 
-    
-    
+
+
     IEnumerator destroyBullete()
     {
         yield return new WaitForSeconds(destroyTime);
-        Debug.Log("timeToDes");
         photonView.RPC("Destroy", RpcTarget.AllBuffered);
     }
 
@@ -21,8 +20,7 @@ public class bullete : MonoBehaviourPun
     void Destroy()
     {
         Destroy(this.gameObject);
-   
-        Debug.Log("dest");
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -31,11 +29,7 @@ public class bullete : MonoBehaviourPun
         {
             return;
         }
-        else 
-        {
-            Debug.Log("haha");
-        }
-
+        
         PhotonView target = collision.gameObject.GetComponent<PhotonView>();
         if (target != null)
         {
@@ -46,7 +40,6 @@ public class bullete : MonoBehaviourPun
             }
             else
             {
-                Debug.Log("notmine");
                 return;
             }
         }
@@ -68,4 +61,6 @@ public class bullete : MonoBehaviourPun
     {
         coloring();
     }
+
+
 }

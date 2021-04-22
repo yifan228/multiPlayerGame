@@ -23,8 +23,15 @@ public class Throw : MonoBehaviourPun
 
     public static Throw instance;
 
+    public bool talking=false;
+
     Vector2 direction;
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        instance = this;
+    }
     void Start()
     {
         points = new GameObject[numberOfPoints];
@@ -44,9 +51,9 @@ public class Throw : MonoBehaviourPun
         direction = mousePosition - bowPosition;
         transform.up = direction;
 
-        if (photonView.IsMine)
+        if (photonView.IsMine && !talking)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(1))
             {
                 startHoldDownTime = Time.time;
                 gameObject.GetComponent<SpriteRenderer>().enabled = true;
@@ -58,13 +65,13 @@ public class Throw : MonoBehaviourPun
                 //    Debug.Log(direction);
             }
 
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(1))
             {
                 HoldDownTime = Time.time - startHoldDownTime;
                 nowForce = caclulateNowForce();
             }
 
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(1))
             {
                 HoldDownTime = Time.time - startHoldDownTime;
                 nowForce = caclulateNowForce();
@@ -112,6 +119,16 @@ public class Throw : MonoBehaviourPun
 
         return position;
 
+    }
+
+    public void isTalking()
+    {
+        talking = true;
+    }
+
+    public void isNotTalking()
+    {
+        talking = false;
     }
     //public void destroyThisWeapon()
     //{

@@ -13,7 +13,7 @@ public class mainchar : MonoBehaviourPun
 
     public static mainchar instance;
 
-    public PhotonView photonView;
+    //public PhotonView photonView;
 
     public Text playerName;
 

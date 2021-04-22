@@ -21,6 +21,9 @@ public class GameManager : MonoBehaviour
     public bool startRespawn;
     public static GameManager instance = null;
 
+    public GameObject statsCanvas;
+    public int assistNum = 1;
+
     private void Awake()
     {
         
@@ -33,7 +36,17 @@ public class GameManager : MonoBehaviour
         if (startRespawn)
         {
             StartRespawn();
-        } 
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape)&&assistNum ==1)
+        {
+            statsCanvas.SetActive(true);
+            assistNum = assistNum * -1;
+        } else if (Input.GetKeyDown(KeyCode.Escape)&&assistNum==-1)
+        {
+            statsCanvas.SetActive(false);
+            assistNum = assistNum * -1;
+        }
     }
 
     void StartRespawn()
@@ -44,6 +57,7 @@ public class GameManager : MonoBehaviour
         {
             respawnUi.SetActive(false);
             startRespawn = false;
+            setRespawnLocation();
             localPlayer.GetComponent<mainchar>().DisableInputs = false;
             localPlayer.GetComponent<PhotonView>().RPC("Revive", RpcTarget.AllBuffered);
         }
@@ -62,5 +76,22 @@ public class GameManager : MonoBehaviour
         PhotonNetwork.Instantiate(playerPrefab.name,new Vector2(playerPrefab.transform.position.x*randomValue,playerPrefab.transform.position.y),Quaternion.identity,0);
         canvas.SetActive(false);
         sceneCam.SetActive(false);
+    }
+
+    void setRespawnLocation()
+    {
+        float rng = Random.Range(-5, 5);
+        localPlayer.transform.position = new Vector2(rng,5f);
+    }
+
+    public void leaveRoomBtn()
+    {
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.LoadLevel(0);
+    }
+
+    public void BackToGame()
+    {
+        statsCanvas.SetActive(false);
     }
 }
