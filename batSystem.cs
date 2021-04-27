@@ -10,12 +10,16 @@ public class batSystem : MonoBehaviourPun
     public Camera charcamera;
 
     public Vector2 HitForceVector;
-    public bool canHit =false;
+    public Vector2 HitPlayerForceVector;
+    private bool canHit =false;
+    private bool canHitPlayer = false;
     public bool IsBullete;
     private bool IsmyExchaneBullete;
+    public bool Isenemy;
 
     public float BatForce = 500;
     private Rigidbody2D HitGoal;
+    private Rigidbody2D HitGaolPlayer;
     private Vector3 GaolPosition;
     private Vector2 GaolVelocity;
     
@@ -33,6 +37,10 @@ public class batSystem : MonoBehaviourPun
         {
             HitGoal = col.GetComponent<Rigidbody2D>();
             canHit = true;          
+        }else if(col.tag == "Player")
+        {
+            HitGaolPlayer = col.GetComponent<Rigidbody2D>();
+            canHitPlayer = true;
         }
     }
 
@@ -41,6 +49,9 @@ public class batSystem : MonoBehaviourPun
         if (col.tag == "Bullete")
         {
             canHit = false;
+        }else if(col.tag == "Player")
+        {
+            canHitPlayer = false;
         }
     }
 
@@ -53,7 +64,7 @@ public class batSystem : MonoBehaviourPun
                 Vector2 mousePosition = charcamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f));
                 Vector2 batPosition = this.transform.position;
                 HitForceVector = (mousePosition - batPosition) * BatForce;
-                HitGoal.AddForceAtPosition(HitForceVector, HitGoal.transform.position, ForceMode2D.Impulse);;
+                HitGoal.AddForceAtPosition(HitForceVector, HitGoal.transform.position, ForceMode2D.Impulse);
                 //Debug.Log("hitting");
                 //Debug.Log(HitForceVector);
 
@@ -62,7 +73,14 @@ public class batSystem : MonoBehaviourPun
             
             mainchar.instance.setPosition(GaolPosition);
             mainchar.instance.setVelocity(GaolVelocity);
+        }else if (canHitPlayer && Isenemy)
+        {
+            Vector2 mousePosition = charcamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f));
+            Vector2 batPosition = this.transform.position;
+            HitPlayerForceVector = (mousePosition - batPosition) * BatForce *10f;
+            HitGaolPlayer.AddForceAtPosition(HitPlayerForceVector, HitGaolPlayer.transform.position, ForceMode2D.Impulse);
         }
+
     }
 
     private void Update()
@@ -71,8 +89,8 @@ public class batSystem : MonoBehaviourPun
         {
             if (Input.GetMouseButton(0))
             {
-                RaycastHit2D hit = Physics2D.Raycast(charcamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f)), Vector2.zero);
-
+                RaycastHit2D hit = Physics2D.CircleCast(charcamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f)),0.3f,Vector2.zero);
+                
                 if (hit)
                 {
                     if (hit.collider.tag == "Bullete")
@@ -86,12 +104,18 @@ public class batSystem : MonoBehaviourPun
                             GaolPosition =(hit.collider.transform.position);
                             //Debug.Log(hit.collider.GetComponent<Rigidbody2D>().velocity);
                             GaolVelocity = hit.collider.GetComponent<Rigidbody2D>().velocity;
-                            hit.collider.gameObject.SetActive(false);
+                            hit.collider.GetComponent<PhotonView>().RPC("Destroy",RpcTarget.AllBuffered);
+                        }
+                        else if(!hit.collider.GetComponent<PhotonView>().IsMine && hit.collider.tag=="Player")
+                        {
+                            Isenemy = true;
+                            IsmyExchaneBullete = false;
+
                         }
                         else
                         {
+                            Isenemy = false;
                             IsmyExchaneBullete = false;
-                            
                         }
                     }
                     else
@@ -101,7 +125,7 @@ public class batSystem : MonoBehaviourPun
 
                 }
 
-                //Debug.Log(hit.collider.name);
+                Debug.Log(hit.collider.name);
                 //Debug.Log(Input.mousePosition);
                 //Debug.Log(charcamera.ScreenToWorldPoint(Input.mousePosition+ charcamera.WorldToScreenPoint(charcamera.transform.position)));
                 //Debug.Log(charcamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f)));
