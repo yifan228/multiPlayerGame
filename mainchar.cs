@@ -30,6 +30,7 @@ public class mainchar : MonoBehaviourPun
     {
         if (photonView.IsMine)
         {
+            instance = this;
             GameManager.instance.localPlayer = this.gameObject;
             playerName.text = PhotonNetwork.NickName;
             playerCam.SetActive(true);
@@ -58,6 +59,7 @@ public class mainchar : MonoBehaviourPun
     {
         walk();
         camControll();
+        
     }
 
     public void walk()
@@ -122,5 +124,13 @@ public class mainchar : MonoBehaviourPun
         mainchaRSprite.flipX = true;
     }
 
-    
+    public void setPosition(Vector3 position)
+    {
+       target.transform.position = position;
+    }
+
+    public void setVelocity(Vector2 velocity)
+    {
+        target.velocity = velocity;
+    }
 }

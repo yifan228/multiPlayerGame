@@ -11,10 +11,14 @@ public class batSystem : MonoBehaviourPun
 
     public Vector2 HitForceVector;
     public bool canHit =false;
-    public bool Ishit;
+    public bool IsBullete;
+    private bool IsmyExchaneBullete;
 
     public float BatForce = 500;
-    private Rigidbody2D Goal;
+    private Rigidbody2D HitGoal;
+    private Vector3 GaolPosition;
+    private Vector2 GaolVelocity;
+    
     
     public static batSystem instance;
 
@@ -27,7 +31,7 @@ public class batSystem : MonoBehaviourPun
     {
         if (col.tag == "Bullete")
         {
-            Goal = col.GetComponent<Rigidbody2D>();
+            HitGoal = col.GetComponent<Rigidbody2D>();
             canHit = true;          
         }
     }
@@ -40,19 +44,24 @@ public class batSystem : MonoBehaviourPun
         }
     }
 
-    void hitting()
+    void HitOrChangePos()
     {
-        if (Ishit && canHit)
+        if (IsBullete && canHit)
         {
             
 
                 Vector2 mousePosition = charcamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f));
                 Vector2 batPosition = this.transform.position;
                 HitForceVector = (mousePosition - batPosition) * BatForce;
-                Goal.AddForceAtPosition(HitForceVector, Goal.transform.position, ForceMode2D.Impulse);;
-                Debug.Log("hitting");
-                Debug.Log(HitForceVector);
+                HitGoal.AddForceAtPosition(HitForceVector, HitGoal.transform.position, ForceMode2D.Impulse);;
+                //Debug.Log("hitting");
+                //Debug.Log(HitForceVector);
 
+        }else if(IsBullete && (!canHit) && (IsmyExchaneBullete))
+        {
+            
+            mainchar.instance.setPosition(GaolPosition);
+            mainchar.instance.setVelocity(GaolVelocity);
         }
     }
 
@@ -68,24 +77,36 @@ public class batSystem : MonoBehaviourPun
                 {
                     if (hit.collider.tag == "Bullete")
                     {
-
-                        Debug.Log("cameraDetectCanHit");
-                        Ishit = true;
+                        //Debug.Log("cameraDetectCanHit");
+                        IsBullete = true;
+                        if (hit.collider.GetComponent<PhotonView>().IsMine && !canHit)
+                        {
+                            IsmyExchaneBullete = true;
+                            
+                            GaolPosition =(hit.collider.transform.position);
+                            //Debug.Log(hit.collider.GetComponent<Rigidbody2D>().velocity);
+                            GaolVelocity = hit.collider.GetComponent<Rigidbody2D>().velocity;
+                            hit.collider.gameObject.SetActive(false);
+                        }
+                        else
+                        {
+                            IsmyExchaneBullete = false;
+                            
+                        }
                     }
                     else
                     {
-                        Debug.Log("whatUp");
-                        Ishit = false;
+                        IsBullete = false;
                     }
 
                 }
 
-                Debug.Log(hit.collider.name);
+                //Debug.Log(hit.collider.name);
                 //Debug.Log(Input.mousePosition);
                 //Debug.Log(charcamera.ScreenToWorldPoint(Input.mousePosition+ charcamera.WorldToScreenPoint(charcamera.transform.position)));
                 //Debug.Log(charcamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f)));
                 //Debug.Log(this.transform.position);
-                hitting();
+                HitOrChangePos();
             }
         }
     }

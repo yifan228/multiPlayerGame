@@ -8,7 +8,7 @@ public class bullete : MonoBehaviourPun
     public float destroyTime =5f;
     public float damage = 0.15f;
 
-
+    
 
     IEnumerator destroyBullete()
     {

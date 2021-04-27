@@ -9,12 +9,15 @@ public class menuManager : MonoBehaviourPunCallbacks
 {
     public static menuManager instance;
 
-    [SerializeField]private GameObject nameSpace, roomSpace;
+    [SerializeField] private GameObject nameSpace, roomSpace, playerListScreen;
 
-    [SerializeField]private GameObject CRBtn, JRBtn, NBtn;
-    
-    [SerializeField] private InputField createRoomIF,joinRoomIF,nameIF;
+    [SerializeField] private GameObject CRBtn, JRBtn, NBtn;
 
+    [SerializeField] private InputField createRoomIF, joinRoomIF, nameIF;
+
+    [SerializeField] private Text playerListText;
+
+    public Button startGameBtn;
 
     private void Awake()
     {
@@ -25,32 +28,39 @@ public class menuManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("connected to master!!");
-        PhotonNetwork.JoinLobby(TypedLobby.Default);
-    }
-    public override void OnJoinedLobby()
-    {
-        Debug.Log("connected to lobby");
         nameSpace.SetActive(true);
+        //PhotonNetwork.JoinLobby(TypedLobby.Default);
     }
+    //public override void OnJoinedLobby()
+    //{
+    //    Debug.Log("connected to lobby");
+    //    nameSpace.SetActive(true);
+
+    //}
 
     public override void OnJoinedRoom()
     {
-        PhotonNetwork.LoadLevel(1);
+        roomSpace.SetActive(false);
+        playerListScreen.SetActive(true);
+        photonView.RPC("UpdateLobbyUI", RpcTarget.All);
     }
 
-    #region UImethod
+    
     public void Onclick_CreateRoomBtn()
     {
 
-        PhotonNetwork.CreateRoom(createRoomIF.text,new RoomOptions { MaxPlayers = 4},null);
+        PhotonNetwork.CreateRoom(createRoomIF.text);
+        
     }
 
     public void Onclick_JoinRoom()
     {
-        RoomOptions RO = new RoomOptions();
-        RO.MaxPlayers = 4;
-        PhotonNetwork.JoinOrCreateRoom(joinRoomIF.text, RO, TypedLobby.Default);
+        //RoomOptions RO = new RoomOptions();
+        //RO.MaxPlayers = 4;
+        PhotonNetwork.JoinRoom(joinRoomIF.text);
     }
+
+
 
     public void Name()
     {
@@ -65,5 +75,43 @@ public class menuManager : MonoBehaviourPunCallbacks
             NBtn.SetActive(true);
         }
     }
-    #endregion
+
+    public void onclickStartGameBtn()
+    {
+        photonView.RPC("StartGame", RpcTarget.AllBuffered);
+    }
+
+    [PunRPC]
+    public void StartGame()
+    {
+        PhotonNetwork.LoadLevel(1);
+    }
+
+    public void onclickLeaveBtn()
+    {
+        PhotonNetwork.LeaveRoom();
+        playerListScreen.SetActive(false);
+        //PhotonNetwork.JoinLobby(TypedLobby.Default);
+    }
+
+    [PunRPC]
+    public void UpdateLobbyUI()
+    {
+        playerListText.text = "";
+
+        //display all the player currently in the lobby
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            playerListText.text += player.NickName + "\n";
+        }
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            startGameBtn.interactable = true;
+        }
+        else
+        {
+            startGameBtn.interactable = false;
+        }
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
 
 public class Throw : MonoBehaviourPun
@@ -25,8 +26,14 @@ public class Throw : MonoBehaviourPun
 
     public bool talking=false;
 
+    bool instantiatePoint;
+
     Vector2 direction;
     // Start is called before the first frame update
+
+    [Header("spell bar")]
+    public Image spellBar,spellAmount;
+    public float spellCost = 0.2f;
 
     private void Awake()
     {
@@ -34,18 +41,19 @@ public class Throw : MonoBehaviourPun
     }
     void Start()
     {
-        points = new GameObject[numberOfPoints];
-        for (int i = 0; i < numberOfPoints; i++)
-        {
+        //points = new GameObject[numberOfPoints];
+        //for (int i = 0; i < numberOfPoints; i++)
+        //{
 
-            points[i] = Instantiate(point, shootPoint.position, Quaternion.identity);
+        //    points[i] = Instantiate(point, shootPoint.position, Quaternion.identity);
 
-        }
+        //}
     }
 
     // Update is called once per frame
     void Update()
     {
+        
         Vector2 bowPosition = playercamera.ScreenToWorldPoint(shootPoint.position);
         Vector2 mousePosition = playercamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0.1f));
         direction = mousePosition - bowPosition;
@@ -53,45 +61,70 @@ public class Throw : MonoBehaviourPun
 
         if (photonView.IsMine && !talking)
         {
-            if (Input.GetMouseButtonDown(1))
+            photonView.RPC("SpellBarUpdateAutoRestore", RpcTarget.AllBuffered);
+            if(spellAmount.fillAmount >= spellCost)
             {
-                startHoldDownTime = Time.time;
-                gameObject.GetComponent<SpriteRenderer>().enabled = true;
+                if (Input.GetMouseButtonDown(1))
+                {
+                    points = new GameObject[numberOfPoints];
+                    for (int i = 0; i < numberOfPoints; i++)
+                    {
 
-                //    Debug.Log(Input.mousePosition);
-                //    Debug.Log(shootPoint.position);
-                //    Debug.Log(bowPosition);
-                //    Debug.Log(mousePosition);
-                //    Debug.Log(direction);
+                        points[i] = Instantiate(point, shootPoint.position, Quaternion.identity);
+
+                    }
+                    instantiatePoint = true;
+                    startHoldDownTime = Time.time;
+                    gameObject.GetComponent<SpriteRenderer>().enabled = true;
+
+                    //    Debug.Log(Input.mousePosition);
+                    //    Debug.Log(shootPoint.position);
+                    //    Debug.Log(bowPosition);
+                    //    Debug.Log(mousePosition);
+                    //    Debug.Log(direction);
+                }
+
+                if (Input.GetMouseButton(1))
+                {
+                    HoldDownTime = Time.time - startHoldDownTime;
+                    nowForce = caclulateNowForce();
+
+                }
+
+                if (photonView.IsMine&&instantiatePoint)
+                {
+                    for (int i = 0; i < numberOfPoints; i++)
+                    {
+                        
+                            points[i].transform.position = pointPosition(i * spaceBetweenPoints);
+                        
+                    }
+                }
+
+                if (Input.GetMouseButtonUp(1))
+                {
+                    HoldDownTime = Time.time - startHoldDownTime;
+                    nowForce = caclulateNowForce();
+                    shoot();
+                    turnOffspell();
+                    for (int i = 0; i < numberOfPoints; i++)
+                    {
+                        Destroy(points[i]);
+                    }
+                    instantiatePoint = false;
+                    spellAmount.fillAmount -= spellCost;
+                }
             }
 
-            if (Input.GetMouseButton(1))
-            {
-                HoldDownTime = Time.time - startHoldDownTime;
-                nowForce = caclulateNowForce();
-            }
 
-            if (Input.GetMouseButtonUp(1))
-            {
-                HoldDownTime = Time.time - startHoldDownTime;
-                nowForce = caclulateNowForce();
-                shoot();
-                turnOffspell();
-            }
         }
-        
 
+        
         //if (playerMovement.instance.Hp == 0)
         //{
         //    destroyThisWeapon();
         //}
-        if (photonView.IsMine)
-        {
-            for (int i = 0; i < numberOfPoints; i++)
-            {
-                points[i].transform.position = pointPosition(i * spaceBetweenPoints);
-            }
-        }
+
     }
 
     private float caclulateNowForce()
@@ -138,4 +171,17 @@ public class Throw : MonoBehaviourPun
     //{
     //    gameObject.GetComponent<SpriteRenderer>().enabled = false;
     //}
+
+    [PunRPC]
+    public void SpellBarUpdateAutoRestore()
+    {
+        if (spellAmount.fillAmount < 1f)
+        {
+            spellAmount.fillAmount += 0.3f * Time.deltaTime;
+        }
+        else
+        {
+            spellAmount.fillAmount = 1f;
+        }
+    }
 }
