@@ -8,12 +8,13 @@ public class mainchar : MonoBehaviourPun
 {
     public GameObject playerCam;
     public Rigidbody2D target;
-    public BoxCollider2D boxcollider2D;
+    public BoxCollider2D boxcolliderIsGround2D;
+    public BoxCollider2D IsRihgtWall;
+    public BoxCollider2D IsLeftWall;
     public SpriteRenderer mainchaRSprite;
 
+   
     public static mainchar instance;
-
-    //public PhotonView photonView;
 
     public Text playerName;
 
@@ -72,6 +73,7 @@ public class mainchar : MonoBehaviourPun
             //Debug.Log("jump");
 
         }
+
         if (target.velocity.y < 0f && IsGround() == false)
         {
             target.gravityScale = 1.5f;
@@ -80,6 +82,22 @@ public class mainchar : MonoBehaviourPun
         else
         {
             target.gravityScale = 1f;
+        }
+
+        if (IsRightWallDet())
+        {
+            if (Input.GetAxisRaw("Horizontal")>0)
+            {
+                target.velocity = new Vector2(0, target.velocity.y);
+            }
+        }
+
+        if (IsLeftWallDet())
+        {
+            if (Input.GetAxisRaw("Horizontal") < 0)
+            {
+                target.velocity = new Vector2(0, target.velocity.y);
+            }
         }
 
         if (target.velocity.x < -0.1f && Input.GetAxisRaw("Horizontal")<-0.1f)
@@ -101,7 +119,25 @@ public class mainchar : MonoBehaviourPun
     {
         float extraHeight = 0.1f;
 
-        RaycastHit2D raycastHit = Physics2D.BoxCast(boxcollider2D.bounds.center, boxcollider2D.bounds.size, 0f, Vector2.down, extraHeight, platformlayerMask);
+        RaycastHit2D raycastHit = Physics2D.BoxCast(boxcolliderIsGround2D.bounds.center, boxcolliderIsGround2D.bounds.size, 0f, Vector2.down, extraHeight, platformlayerMask);
+        //Debug.Log(raycastHit.collider);
+        return raycastHit.collider != null;
+    }
+
+    public bool IsRightWallDet()
+    {
+        float extraHeight = 0.1f;
+
+        RaycastHit2D raycastHit = Physics2D.BoxCast(IsRihgtWall.bounds.center,IsRihgtWall.bounds.size, 0f, Vector2.right, extraHeight, platformlayerMask);
+        //Debug.Log(raycastHit.collider);
+        return raycastHit.collider != null;
+    }
+
+    public bool IsLeftWallDet()
+    {
+        float extraHeight = 0.1f;
+
+        RaycastHit2D raycastHit = Physics2D.BoxCast(IsLeftWall.bounds.center,IsLeftWall.bounds.size, 0f, Vector2.left, extraHeight, platformlayerMask);
         //Debug.Log(raycastHit.collider);
         return raycastHit.collider != null;
     }

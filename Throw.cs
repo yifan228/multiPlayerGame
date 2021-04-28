@@ -12,7 +12,7 @@ public class Throw : MonoBehaviourPun
     public float nowForce;
 
     private float startHoldDownTime;
-    float HoldDownTime; 
+    float HoldDownTime;
 
     public Transform shootPoint;
 
@@ -24,7 +24,7 @@ public class Throw : MonoBehaviourPun
 
     public static Throw instance;
 
-    public bool talking=false;
+    public bool talking = false;
 
     bool instantiatePoint;
 
@@ -32,7 +32,7 @@ public class Throw : MonoBehaviourPun
     // Start is called before the first frame update
 
     [Header("spell bar")]
-    public Image spellBar,spellAmount;
+    public Image spellBar, spellAmount;
     public float spellCost = 0.2f;
 
     private void Awake()
@@ -53,7 +53,7 @@ public class Throw : MonoBehaviourPun
     // Update is called once per frame
     void Update()
     {
-        
+
         Vector2 bowPosition = playercamera.ScreenToWorldPoint(shootPoint.position);
         Vector2 mousePosition = playercamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0.1f));
         direction = mousePosition - bowPosition;
@@ -62,7 +62,7 @@ public class Throw : MonoBehaviourPun
         if (photonView.IsMine && !talking)
         {
             photonView.RPC("SpellBarUpdateAutoRestore", RpcTarget.AllBuffered);
-            if(spellAmount.fillAmount >= spellCost)
+            if (spellAmount.fillAmount >= spellCost)
             {
                 if (Input.GetMouseButtonDown(1))
                 {
@@ -91,13 +91,13 @@ public class Throw : MonoBehaviourPun
 
                 }
 
-                if (photonView.IsMine&&instantiatePoint)
+                if (photonView.IsMine && instantiatePoint)
                 {
                     for (int i = 0; i < numberOfPoints; i++)
                     {
-                        
-                            points[i].transform.position = pointPosition(i * spaceBetweenPoints);
-                        
+
+                        points[i].transform.position = pointPosition(i * spaceBetweenPoints);
+
                     }
                 }
 
@@ -112,14 +112,14 @@ public class Throw : MonoBehaviourPun
                         Destroy(points[i]);
                     }
                     instantiatePoint = false;
-                    spellAmount.fillAmount -= spellCost;
+                    photonView.RPC("SpellCost",RpcTarget.AllBuffered,spellCost);
                 }
             }
 
 
         }
 
-        
+
         //if (playerMovement.instance.Hp == 0)
         //{
         //    destroyThisWeapon();
@@ -134,7 +134,7 @@ public class Throw : MonoBehaviourPun
         float force = launchForce * rate;
         return force;
 
-    }    
+    }
 
     public void turnOffspell()
     {
@@ -183,5 +183,11 @@ public class Throw : MonoBehaviourPun
         {
             spellAmount.fillAmount = 1f;
         }
+    }
+
+    [PunRPC]
+    public void SpellCost(float cost)
+    {
+        spellAmount.fillAmount -= cost;
     }
 }
