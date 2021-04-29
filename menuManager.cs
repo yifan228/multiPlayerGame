@@ -18,10 +18,12 @@ public class menuManager : MonoBehaviourPunCallbacks
     [SerializeField] private Text playerListText;
 
     public Button startGameBtn;
+    //public string Myname;
 
     private void Awake()
     {
         PhotonNetwork.ConnectUsingSettings();
+        instance = this;
     }
    
 
@@ -67,6 +69,7 @@ public class menuManager : MonoBehaviourPunCallbacks
         PhotonNetwork.NickName = nameIF.text;
         nameSpace.SetActive(false);
         roomSpace.SetActive(true);
+        //Myname = nameIF.text;
     }
     public void onNameFieldChange()
     {

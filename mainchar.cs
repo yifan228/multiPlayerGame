@@ -169,4 +169,11 @@ public class mainchar : MonoBehaviourPun
     {
         target.velocity = velocity;
     }
+
+    [PunRPC]
+    public void GameoverScene()
+    {
+        PhotonNetwork.LoadLevel("GameOver");
+
+    }//declare gameover to everyone
 }

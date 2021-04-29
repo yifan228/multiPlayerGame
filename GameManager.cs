@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour
     public GameObject statsCanvas;
     public int assistNum = 1;
 
+    public Transform endingPoint;
+
     private void Awake()
     {
         
@@ -80,8 +82,18 @@ public class GameManager : MonoBehaviour
 
     void setRespawnLocation()
     {
-        float rng = Random.Range(-5, 5);
-        localPlayer.transform.position = new Vector2(rng,5f);
+        float rngPlace = Random.Range(0, 10);
+        if (rngPlace <=4f)
+        {
+            GameOver.instance.IsDef = false;
+            float rng = Random.Range(-5, 5);
+            localPlayer.transform.position = new Vector2(rng, 4f);
+        }
+        else
+        {
+            GameOver.instance.IsDef = true;
+            localPlayer.transform.position = new Vector2(endingPoint.position.x,endingPoint.position.y-1f);
+        }
     }
 
     public void leaveRoomBtn()
