@@ -176,4 +176,13 @@ public class mainchar : MonoBehaviourPun
         PhotonNetwork.LoadLevel("GameOver");
 
     }//declare gameover to everyone
+
+    [PunRPC]
+    public void AdForce(Vector2 force)
+    {
+        if (photonView.IsMine)
+        {
+            target.AddForce(force, ForceMode2D.Impulse);
+        }
+    }
 }
