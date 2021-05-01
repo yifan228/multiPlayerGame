@@ -14,7 +14,7 @@ public class LmeleeHit : MonoBehaviourPun
     [SerializeField] private GameObject myplayerWeapon;
 
     private float hitCost=0.9f;
-    [HideInInspector]public float power = 100f;
+    private float power = 150f;
 
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -71,17 +71,17 @@ public class LmeleeHit : MonoBehaviourPun
 
     private void CalculateForceAndHIt()
     {
-        Vector2 vector = otherPlayer.transform.position - (this.transform.position - new Vector3(0.3f, 0f, 0f));
+        Vector2 vector = otherPlayer.transform.position - (this.transform.position + new Vector3(0.3f, 0f, 0f));
         Vector2 force = vector.normalized * power;
         otherPlayer.GetComponent<PhotonView>().RPC("AdForce", RpcTarget.AllBuffered, force);
-        Debug.Log("itsAddedforce");
+        
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q) && photonView.IsMine && myplayerWeapon.GetComponent<Throw>().spellAmount.fillAmount > hitCost)
         {
-            Debug.Log(this.transform.position);
+            
             photonView.RPC("TurnOnSprite", RpcTarget.AllBuffered);
             photonView.RPC("MainCharSpriteXTrue", RpcTarget.AllBuffered);
             photonView.RPC("SpellCostHit", RpcTarget.AllBuffered, hitCost);

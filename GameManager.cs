@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour
 
     public Transform endingPoint;
 
+    [SerializeField]private GameObject gameoverscipt;
+
     private void Awake()
     {
         
@@ -59,9 +61,10 @@ public class GameManager : MonoBehaviour
         {
             respawnUi.SetActive(false);
             startRespawn = false;
-            setRespawnLocation();
+            
             localPlayer.GetComponent<mainchar>().DisableInputs = false;
             localPlayer.GetComponent<PhotonView>().RPC("Revive", RpcTarget.AllBuffered);
+            setRespawnLocation();
         }
     }
 
@@ -83,17 +86,19 @@ public class GameManager : MonoBehaviour
     void setRespawnLocation()
     {
         float rngPlace = Random.Range(0, 10);
-        if (rngPlace <=4f)
+        if (rngPlace <=5f)
         {
-            GameOver.instance.IsDef = false;
+            localPlayer.GetComponent<mainchar>().IsDef = false;
             float rng = Random.Range(-5, 5);
             localPlayer.transform.position = new Vector2(rng, 4f);
         }
         else
         {
-            GameOver.instance.IsDef = true;
-            localPlayer.transform.position = new Vector2(endingPoint.position.x,endingPoint.position.y-1f);
+            localPlayer.GetComponent<mainchar>().IsDef = true;
+            localPlayer.transform.position = new Vector2(endingPoint.position.x+6f,endingPoint.position.y-1f);
         }
+
+        
     }
 
     public void leaveRoomBtn()

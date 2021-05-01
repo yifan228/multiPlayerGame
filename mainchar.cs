@@ -13,6 +13,7 @@ public class mainchar : MonoBehaviourPun
     public BoxCollider2D IsLeftWall;
     public SpriteRenderer mainchaRSprite;
 
+    public bool IsDef = false;//搞人的玩家
    
     public static mainchar instance;
 
@@ -173,7 +174,10 @@ public class mainchar : MonoBehaviourPun
     [PunRPC]
     public void GameoverScene()
     {
-        PhotonNetwork.LoadLevel("GameOver");
+        if (photonView.IsMine && IsDef == false)
+        {
+            PhotonNetwork.LoadLevel("GameOver");
+        }
 
     }//declare gameover to everyone
 
@@ -182,7 +186,7 @@ public class mainchar : MonoBehaviourPun
     {
         if (photonView.IsMine)
         {
-            target.AddForce(force, ForceMode2D.Impulse);
+            target.velocity = force;
         }
-    }
+    }//using AddForce will render a wierd phenomanon,using velocity either
 }

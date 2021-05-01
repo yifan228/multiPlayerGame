@@ -113,7 +113,7 @@ public class batSystem : MonoBehaviourPun
             if (Input.GetMouseButton(0))
             {
                 RaycastHit2D hit = Physics2D.CircleCast(charcamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y,10f)),0.3f,Vector2.zero);
-                Debug.Log(hit.transform.position);
+                //Debug.Log(hit.transform.position);
                 if (hit)
                 {
                     if (hit.collider.tag == "Bullete")
