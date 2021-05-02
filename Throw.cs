@@ -35,6 +35,9 @@ public class Throw : MonoBehaviourPun
     public Image spellBar, spellAmount;
     public float spellCost = 0.2f;
 
+    [Header("shootSound")]
+    public AudioSource shootSound;
+
     private void Awake()
     {
         instance = this;
@@ -103,6 +106,7 @@ public class Throw : MonoBehaviourPun
 
                 if (Input.GetMouseButtonUp(1))
                 {
+                    shootSound.Play();
                     HoldDownTime = Time.time - startHoldDownTime;
                     nowForce = caclulateNowForce();
                     shoot();
@@ -175,13 +179,16 @@ public class Throw : MonoBehaviourPun
     [PunRPC]
     public void SpellBarUpdateAutoRestore()
     {
-        if (spellAmount.fillAmount < 1f)
+        if (photonView != null)
         {
-            spellAmount.fillAmount += 0.3f * Time.deltaTime;
-        }
-        else
-        {
-            spellAmount.fillAmount = 1f;
+            if (spellAmount.fillAmount < 1f)
+            {
+                spellAmount.fillAmount += 0.3f * Time.deltaTime;
+            }
+            else
+            {
+                spellAmount.fillAmount = 1f;
+            }
         }
     }
 

@@ -64,7 +64,7 @@ public class talkManager: MonoBehaviourPun,IPunObservable
         {
             stream.SendNext(TalkBubble.activeSelf);
         }
-        else if(stream.IsReading)
+        else if (stream.IsReading)
         {
             TalkBubble.SetActive((bool)stream.ReceiveNext());
         }

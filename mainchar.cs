@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 
-public class mainchar : MonoBehaviourPun
+public class mainchar : MonoBehaviourPun,IPunObservable
 {
     public GameObject playerCam;
     public Rigidbody2D target;
@@ -13,11 +13,13 @@ public class mainchar : MonoBehaviourPun
     public BoxCollider2D IsLeftWall;
     public SpriteRenderer mainchaRSprite;
 
+    [SerializeField]
     public bool IsDef = false;//搞人的玩家
    
     public static mainchar instance;
 
     public Text playerName;
+    public string playerMasterName;//used to gameOverManager get winnerName
 
     [SerializeField]
     private float runSpeed, jumpForce;
@@ -28,6 +30,7 @@ public class mainchar : MonoBehaviourPun
 
     public bool DisableInputs = false;
 
+    public AudioSource jumpSound;
     private void Awake()
     {
         if (photonView.IsMine)
@@ -35,6 +38,7 @@ public class mainchar : MonoBehaviourPun
             instance = this;
             GameManager.instance.localPlayer = this.gameObject;
             playerName.text = PhotonNetwork.NickName;
+            playerMasterName = PhotonNetwork.NickName;
             playerCam.SetActive(true);
 
         }
@@ -72,6 +76,7 @@ public class mainchar : MonoBehaviourPun
         {
             target.AddForce(Vector2.up * jumpForce);
             //Debug.Log("jump");
+            jumpSound.Play();
 
         }
 
@@ -171,16 +176,7 @@ public class mainchar : MonoBehaviourPun
         target.velocity = velocity;
     }
 
-    [PunRPC]
-    public void GameoverScene()
-    {
-        if (photonView.IsMine && IsDef == false)
-        {
-            PhotonNetwork.LoadLevel("GameOver");
-        }
-
-    }//declare gameover to everyone
-
+    
     [PunRPC]
     public void AdForce(Vector2 force)
     {
@@ -189,4 +185,23 @@ public class mainchar : MonoBehaviourPun
             target.velocity = force;
         }
     }//using AddForce will render a wierd phenomanon,using velocity either
+
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(IsDef);
+            //stream.SendNext(playerMasterName);
+
+        }
+        else if (stream.IsReading)
+        {
+            IsDef = (bool)stream.ReceiveNext();
+            //playerMasterName = (string)stream.ReceiveNext();
+        }
+    }//to synchronize isdef value 用this會有問題？（待驗證）
+
+
 }
+

@@ -10,7 +10,7 @@ public class GameOverManager : MonoBehaviourPun
 
     private void Start()
     {
-        Winner.text = "efan";
+        Winner.text = GameOver.instance.Master;
     }
 
     public void LeaveBtn()

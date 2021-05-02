@@ -24,7 +24,9 @@ public class batSystem : MonoBehaviourPun
     private Rigidbody2D HitGaolPlayer;
     private Vector3 GaolPosition;
     private Vector2 GaolVelocity;
-    
+
+    [Header("dashSound")]
+    public AudioSource dashSound;
     
     public static batSystem instance;
 
@@ -133,6 +135,7 @@ public class batSystem : MonoBehaviourPun
                             //Debug.Log(hit.collider.GetComponent<Rigidbody2D>().velocity);
                             GaolVelocity = hit.collider.GetComponent<Rigidbody2D>().velocity;
                             hit.collider.GetComponent<PhotonView>().RPC("Destroy",RpcTarget.AllBuffered);
+                            dashSound.Play();
                         }
                         else
                         {
