@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
 
-public class health : MonoBehaviourPun
+public class health : MonoBehaviourPun,IPunObservable
 {
     public Image fillImage;
 
@@ -74,8 +74,33 @@ public class health : MonoBehaviourPun
    public void HealthUpdate(float damage)
     {
         fillImage.fillAmount -= damage;
+
         Hp = fillImage.fillAmount;
         checkHp();
     }
-  
+    private void Update()
+    {
+        if (Hp < 1f && Hp > 0)
+        {
+            Hp += 0.1f * Time.deltaTime;
+            if (Hp > 1f)
+            {
+                Hp = 1f;
+            }
+        }
+
+        fillImage.fillAmount = Hp; 
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(Hp);
+
+        }else if (stream.IsReading)
+        {
+            this.Hp = (float)stream.ReceiveNext();
+        }
+    }
 }
