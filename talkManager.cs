@@ -55,7 +55,38 @@ public class talkManager: MonoBehaviourPun,IPunObservable
     {
         yield return new WaitForSeconds(3f);
         TalkBubble.SetActive(false);
-        
+        talkText.text = "";
+    }
+
+    public void shortcut1()
+    {
+
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "屎好");
+    }
+
+    public void shortcut2()
+    {
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "別激動！");
+    }
+
+    public void shortcut3()
+    {
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "糞！");
+    }
+
+    public void shortcut4()
+    {
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "我當時害怕屎了");
+    }
+
+    public void shortcut5()
+    {
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "安全嗎？");
+    }
+
+    public void shortcut6()
+    {
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "麻吉拉！");
     }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

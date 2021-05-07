@@ -76,7 +76,7 @@ public class mainchar : MonoBehaviourPun,IPunObservable
         {
             target.AddForce(Vector2.up * jumpForce);
             //Debug.Log("jump");
-            jumpSound.Play();
+            photonView.RPC("JumpSoundPlay", RpcTarget.AllBuffered);
 
         }
 
@@ -186,6 +186,11 @@ public class mainchar : MonoBehaviourPun,IPunObservable
         }
     }//using AddForce will render a wierd phenomanon,using velocity either
 
+    [PunRPC]
+    public void JumpSoundPlay()
+    {
+        jumpSound.Play();
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

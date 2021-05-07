@@ -81,7 +81,9 @@ public class batSystem : MonoBehaviourPun
             
             mainchar.instance.setPosition(GaolPosition);
             mainchar.instance.setVelocity(GaolVelocity);
-        }else if (canHitPlayer && Isenemy && (!IsBullete))
+            photonView.RPC("DashSoundPlay",RpcTarget.AllBuffered);
+        }
+        else if (canHitPlayer && Isenemy && (!IsBullete))
         {
             Vector2 mousePosition = charcamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f));
             Vector2 batPosition = this.transform.position;
@@ -135,7 +137,7 @@ public class batSystem : MonoBehaviourPun
                             //Debug.Log(hit.collider.GetComponent<Rigidbody2D>().velocity);
                             GaolVelocity = hit.collider.GetComponent<Rigidbody2D>().velocity;
                             hit.collider.GetComponent<PhotonView>().RPC("Destroy",RpcTarget.AllBuffered);
-                            dashSound.Play();
+                            
                         }
                         else
                         {
@@ -165,5 +167,11 @@ public class batSystem : MonoBehaviourPun
                 HitOrChangePos();
             }
         }
+        
+    }
+    [PunRPC]
+    public void DashSoundPlay()
+    {
+        dashSound.Play();
     }
 }

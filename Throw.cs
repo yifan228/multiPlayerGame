@@ -106,7 +106,7 @@ public class Throw : MonoBehaviourPun
 
                 if (Input.GetMouseButtonUp(1))
                 {
-                    shootSound.Play();
+                    photonView.RPC("ShootSoundPlay", RpcTarget.AllBuffered);
                     HoldDownTime = Time.time - startHoldDownTime;
                     nowForce = caclulateNowForce();
                     shoot();
@@ -196,5 +196,11 @@ public class Throw : MonoBehaviourPun
     public void SpellCost(float cost)
     {
         spellAmount.fillAmount -= cost;
+    }
+
+    [PunRPC]
+    public void ShootSoundPlay()
+    {
+        shootSound.Play();
     }
 }

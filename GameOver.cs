@@ -10,6 +10,7 @@ public class GameOver : MonoBehaviourPun
     //public string winnerName;
 
     public static GameOver instance;
+    public bool AmIWinner;
 
     private void Awake()
     {
@@ -35,13 +36,14 @@ public class GameOver : MonoBehaviourPun
 
             //photonView.RPC("SetMasterWinnerName", RpcTarget.AllBuffered,a);
 
-            Master = collision.GetComponent<mainchar>().playerName.text;
+            //Master = collision.GetComponent<mainchar>().playerName.text;
 
             if (collision.GetComponent<PhotonView>().IsMine)
             {
-
+                AmIWinner = true;
                 photonView.RPC("GameoverScene", RpcTarget.AllBuffered);
             }
+            else { AmIWinner = false; }
 
             DontDestroyOnLoad(this.gameObject);
             Destroy(this.gameObject, 1.5f);
@@ -71,12 +73,12 @@ public class GameOver : MonoBehaviourPun
     //    }
     //}
 
-    [PunRPC]
-    public void SetMasterWinnerName(string text)
-    {
-        Master = text;
+    //[PunRPC]
+    //public void SetMasterWinnerName(string text)
+    //{
+    //    Master = text;
 
-    }
+    //}先不用角色名字
 
 
 }

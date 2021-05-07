@@ -6,11 +6,25 @@ using Photon.Pun;
 
 public class GameOverManager : MonoBehaviourPun
 {
-    public Text Winner;
-
+    public GameObject youWinner;
+    public GameObject notWinner;
     private void Start()
     {
-        Winner.text = GameOver.instance.Master;
+        youWinner.SetActive(false);
+        notWinner.SetActive(false);
+    }
+
+    private void FixedUpdate()
+    {
+        if (GameOver.instance.AmIWinner == true)
+        {
+            youWinner.SetActive(true);
+            notWinner.SetActive(false);
+        }
+        else {
+            notWinner.SetActive(true);
+            youWinner.SetActive(false);
+        }
     }
 
     public void LeaveBtn()

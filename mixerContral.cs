@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using Photon.Pun;
 
-public class mixerContral : MonoBehaviour
+public class mixerContral : MonoBehaviourPun
 {
     public AudioSource BGM1;
     public AudioSource BGM2;
@@ -58,4 +59,10 @@ public class mixerContral : MonoBehaviour
         SE2.volume = vol;
         SE3.volume = vol;
     }
+
+    //[PunRPC]
+    //public void SetBGMVol()
+    //{
+        
+    //}
 }
