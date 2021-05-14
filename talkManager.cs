@@ -61,7 +61,7 @@ public class talkManager: MonoBehaviourPun,IPunObservable
     public void shortcut1()
     {
 
-        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "屎好");
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "NM屎L！");
     }
 
     public void shortcut2()
@@ -71,22 +71,22 @@ public class talkManager: MonoBehaviourPun,IPunObservable
 
     public void shortcut3()
     {
-        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "糞！");
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "AreWe屎黨了嗎?");
     }
 
     public void shortcut4()
     {
-        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "我當時害怕屎了");
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "你玩的像坨屎╬");
     }
 
     public void shortcut5()
     {
-        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "安全嗎？");
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "屎恩羅天征"+"\n"+"ヽ(`Д´)ノ");
     }
 
     public void shortcut6()
     {
-        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "麻吉拉！");
+        photonView.RPC("SendMsg", RpcTarget.AllBuffered, "我在裝屎");
     }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

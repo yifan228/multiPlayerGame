@@ -9,13 +9,21 @@ public class menuManager : MonoBehaviourPunCallbacks
 {
     public static menuManager instance;
 
-    [SerializeField] private GameObject nameSpace, roomSpace, playerListScreen;
+    [SerializeField] private GameObject nameSpace, roomSpace, playerListScreen,BtListScreen;
 
     [SerializeField] private GameObject CRBtn, JRBtn, NBtn;
 
     [SerializeField] private InputField createRoomIF, joinRoomIF, nameIF;
 
     [SerializeField] private Text playerListText;
+
+    [SerializeField] private Text LTeam, RTeam;
+
+    public bool IsjoinBT;
+    private TypedLobby BattleLobby = new TypedLobby("BTLobby",LobbyType.Default);
+    private TypedLobby TeamLobby = new TypedLobby("TMLobby",LobbyType.Default);
+
+    
 
     public Button startGameBtn;
     //public string Myname;
@@ -31,7 +39,7 @@ public class menuManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("connected to master!!");
         nameSpace.SetActive(true);
-        //PhotonNetwork.JoinLobby(TypedLobby.Default);
+        //PhotonNetwork.JoinLobby();
     }
     //public override void OnJoinedLobby()
     //{
@@ -42,9 +50,18 @@ public class menuManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        roomSpace.SetActive(false);
-        playerListScreen.SetActive(true);
-        photonView.RPC("UpdateLobbyUI", RpcTarget.All);
+        if (IsjoinBT)
+        {
+            roomSpace.SetActive(false);
+            playerListScreen.SetActive(true);
+            photonView.RPC("UpdateLobbyUI", RpcTarget.All);
+        }
+        else
+        {
+            roomSpace.SetActive(false);
+            PhotonNetwork.LoadLevel(3);
+
+        }
     }
 
     
@@ -63,12 +80,14 @@ public class menuManager : MonoBehaviourPunCallbacks
     }
 
 
-
+    //join battle mode
     public void Name()
     {
         PhotonNetwork.NickName = nameIF.text;
         nameSpace.SetActive(false);
         roomSpace.SetActive(true);
+        PhotonNetwork.JoinLobby(BattleLobby);
+        IsjoinBT = true;
         //Myname = nameIF.text;
     }
     public void onNameFieldChange()
@@ -102,7 +121,7 @@ public class menuManager : MonoBehaviourPunCallbacks
     {
         playerListText.text = "";
 
-        //display all the player currently in the lobby
+        //display all the player currently in the lobby(room?) !!!need to test!!!
         foreach (Player player in PhotonNetwork.PlayerList)
         {
             playerListText.text += player.NickName + "\n";
@@ -117,4 +136,18 @@ public class menuManager : MonoBehaviourPunCallbacks
             startGameBtn.interactable = false;
         }
     }
+
+    //to join team mode
+    public void ToJoinTeamLobby()
+    {
+        PhotonNetwork.NickName = nameIF.text;
+        nameSpace.SetActive(false);
+        roomSpace.SetActive(true);
+        PhotonNetwork.JoinLobby(TeamLobby);
+        IsjoinBT = false;
+    }
+
+   
+
+    
 }

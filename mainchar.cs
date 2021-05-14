@@ -15,7 +15,10 @@ public class mainchar : MonoBehaviourPun,IPunObservable
 
     [SerializeField]
     public bool IsDef = false;//搞人的玩家
-   
+
+    public int IsTeamBlueRedTeam = 0;//0 is not Team,1 is blue,-1 is red
+    public Color myTeamColor;
+
     public static mainchar instance;
 
     public Text playerName;
@@ -31,19 +34,41 @@ public class mainchar : MonoBehaviourPun,IPunObservable
     public bool DisableInputs = false;
 
     public AudioSource jumpSound;
-    private void Awake()
+    private void Start()
     {
-        if (photonView.IsMine)
+        if (photonView.IsMine && TeamManager.instance.team ==0)
         {
             instance = this;
+                
             GameManager.instance.localPlayer = this.gameObject;
             playerName.text = PhotonNetwork.NickName;
             playerMasterName = PhotonNetwork.NickName;
             playerCam.SetActive(true);
-
+            
         }
-        else
+        else if (photonView.IsMine && TeamManager.instance.team ==-1)
         {
+            Debug.Log("藍藍幫");
+            instance = this;
+            GameManager.instance.localPlayer = this.gameObject;
+            TeamManager.instance.localPlayer = this.gameObject;
+            playerName.text = PhotonNetwork.NickName;
+            playerMasterName = PhotonNetwork.NickName;
+            playerCam.SetActive(true);
+            playerName.color = Color.blue;
+            
+        }
+        else if(photonView.IsMine && TeamManager.instance.team==1)
+        {
+            instance = this;
+            GameManager.instance.localPlayer = this.gameObject;
+            TeamManager.instance.localPlayer = this.gameObject;
+            playerName.text = PhotonNetwork.NickName;
+            playerMasterName = PhotonNetwork.NickName;
+            playerCam.SetActive(true);
+            playerName.color = Color.red;
+        }
+        else if(!photonView.IsMine && TeamManager.instance.team==0){
             playerName.text = photonView.Owner.NickName;
             playerName.color = Color.red;
         }
@@ -197,16 +222,28 @@ public class mainchar : MonoBehaviourPun,IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(IsDef);
+            if (IsTeamBlueRedTeam != 0)
+            {
+                stream.SendNext(playerName.color);
+            }
             //stream.SendNext(playerMasterName);
 
         }
         else if (stream.IsReading)
         {
             IsDef = (bool)stream.ReceiveNext();
+            if (IsTeamBlueRedTeam != 0)
+            {
+                playerName.color = (Color)stream.ReceiveNext();
+            }
             //playerMasterName = (string)stream.ReceiveNext();
         }
     }//to synchronize isdef value 用this會有問題？（待驗證）
 
-
+    [PunRPC]
+    public void Des()
+    {
+        Destroy(gameObject);
+    }
 }
 

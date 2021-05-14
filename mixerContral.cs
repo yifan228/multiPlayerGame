@@ -29,8 +29,19 @@ public class mixerContral : MonoBehaviourPun
 
     private void FixedUpdate()
     {
-        player = GameObject.Find("Player(Clone)");
-        SE1 = player.GetComponent<AudioSource>();
+        if (mainchar.instance.IsTeamBlueRedTeam == 0)
+        {
+            player = GameObject.Find("Player(Clone)");
+            SE1 = player.GetComponent<AudioSource>();
+        }else if(mainchar.instance.IsTeamBlueRedTeam == 1)
+        {
+            player = GameObject.Find("PlayerBattleBlue(Clone)");
+            SE1 = player.GetComponent<AudioSource>();
+        }else if(mainchar.instance.IsTeamBlueRedTeam == -1)
+        {
+            player = GameObject.Find("PlayerBattleRed(Clone)");
+            SE1 = player.GetComponent<AudioSource>();
+        }
 
         FindWeapon = GameObject.Find("weapon");
         SE2 = FindWeapon.GetComponent<AudioSource>();
