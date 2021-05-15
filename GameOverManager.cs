@@ -29,8 +29,9 @@ public class GameOverManager : MonoBehaviourPun
 
     public void LeaveBtn()
     {
+        Destroy(NotDes.instance.gameObject);
+        PhotonNetwork.LeaveLobby();
         PhotonNetwork.LeaveRoom();
         PhotonNetwork.LoadLevel(0);
-        
     }
 }

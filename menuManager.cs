@@ -17,7 +17,7 @@ public class menuManager : MonoBehaviourPunCallbacks
 
     [SerializeField] private Text playerListText;
 
-    [SerializeField] private Text LTeam, RTeam;
+   
 
     public bool IsjoinBT;
     private TypedLobby BattleLobby = new TypedLobby("BTLobby",LobbyType.Default);
@@ -67,15 +67,15 @@ public class menuManager : MonoBehaviourPunCallbacks
     
     public void Onclick_CreateRoomBtn()
     {
-
+        NotDes.instance.RoomName = createRoomIF.text;
         PhotonNetwork.CreateRoom(createRoomIF.text);
-        
     }
 
     public void Onclick_JoinRoom()
     {
         //RoomOptions RO = new RoomOptions();
         //RO.MaxPlayers = 4;
+        NotDes.instance.RoomName = joinRoomIF.text;
         PhotonNetwork.JoinRoom(joinRoomIF.text);
     }
 
@@ -84,6 +84,7 @@ public class menuManager : MonoBehaviourPunCallbacks
     public void Name()
     {
         PhotonNetwork.NickName = nameIF.text;
+        NotDes.instance.MyName = nameIF.text;
         nameSpace.SetActive(false);
         roomSpace.SetActive(true);
         PhotonNetwork.JoinLobby(BattleLobby);
@@ -141,6 +142,7 @@ public class menuManager : MonoBehaviourPunCallbacks
     public void ToJoinTeamLobby()
     {
         PhotonNetwork.NickName = nameIF.text;
+        NotDes.instance.MyName = nameIF.text;
         nameSpace.SetActive(false);
         roomSpace.SetActive(true);
         PhotonNetwork.JoinLobby(TeamLobby);

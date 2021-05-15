@@ -103,6 +103,8 @@ public class GameManager : MonoBehaviour
 
     public void leaveRoomBtn()
     {
+        Destroy(NotDes.instance.gameObject);
+        PhotonNetwork.LeaveLobby();
         PhotonNetwork.LeaveRoom();
         PhotonNetwork.LoadLevel(0);
     }

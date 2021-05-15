@@ -16,7 +16,7 @@ public class mainchar : MonoBehaviourPun,IPunObservable
     [SerializeField]
     public bool IsDef = false;//搞人的玩家
 
-    public int IsTeamBlueRedTeam = 0;//0 is not Team,1 is blue,-1 is red
+    //public int IsTeamBlueRedTeam = 0;//0 is not Team,1 is blue,-1 is red
     public Color myTeamColor;
 
     public static mainchar instance;
@@ -42,35 +42,41 @@ public class mainchar : MonoBehaviourPun,IPunObservable
                 
             GameManager.instance.localPlayer = this.gameObject;
             playerName.text = PhotonNetwork.NickName;
-            playerMasterName = PhotonNetwork.NickName;
+            //playerMasterName = PhotonNetwork.NickName;
             playerCam.SetActive(true);
             
         }
-        else if (photonView.IsMine && TeamManager.instance.team ==-1)
+        else if (photonView.IsMine && TeamManager.instance.team == -1)
         {
-            Debug.Log("藍藍幫");
+            
             instance = this;
             GameManager.instance.localPlayer = this.gameObject;
             TeamManager.instance.localPlayer = this.gameObject;
+            //playerMasterName = PhotonNetwork.NickName;
             playerName.text = PhotonNetwork.NickName;
-            playerMasterName = PhotonNetwork.NickName;
             playerCam.SetActive(true);
             playerName.color = Color.blue;
-            
+
         }
-        else if(photonView.IsMine && TeamManager.instance.team==1)
+        else if (photonView.IsMine && TeamManager.instance.team == 1)
         {
             instance = this;
             GameManager.instance.localPlayer = this.gameObject;
             TeamManager.instance.localPlayer = this.gameObject;
             playerName.text = PhotonNetwork.NickName;
-            playerMasterName = PhotonNetwork.NickName;
+            //playerMasterName = PhotonNetwork.NickName;
             playerCam.SetActive(true);
             playerName.color = Color.red;
         }
-        else if(!photonView.IsMine && TeamManager.instance.team==0){
-            playerName.text = photonView.Owner.NickName;
-            playerName.color = Color.red;
+        else if(!photonView.IsMine){
+            if (TeamManager.instance.team == 0)
+            {
+                playerName.text = photonView.Owner.NickName;
+                playerName.color = Color.red;
+            }else
+            {
+                playerName.text = photonView.Owner.NickName;
+            }
         }
     }
 
@@ -222,7 +228,7 @@ public class mainchar : MonoBehaviourPun,IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(IsDef);
-            if (IsTeamBlueRedTeam != 0)
+            if (TeamManager.instance.team != 0)
             {
                 stream.SendNext(playerName.color);
             }
@@ -232,7 +238,7 @@ public class mainchar : MonoBehaviourPun,IPunObservable
         else if (stream.IsReading)
         {
             IsDef = (bool)stream.ReceiveNext();
-            if (IsTeamBlueRedTeam != 0)
+            if (TeamManager.instance.team != 0)
             {
                 playerName.color = (Color)stream.ReceiveNext();
             }
