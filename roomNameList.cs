@@ -20,7 +20,6 @@ public class roomNameList : MonoBehaviourPunCallbacks
             if (room.RemovedFromList)
             {
                 DeleteRoom(room);
-
             }
             else
             {

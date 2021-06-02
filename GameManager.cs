@@ -28,6 +28,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField]private GameObject gameoverscipt;
 
+    [Header("teamReSpawnPoint")]
+    public GameObject teamRRResPoint;
+    public GameObject teamLBResPoint;
     private void Awake()
     {
         
@@ -85,19 +88,27 @@ public class GameManager : MonoBehaviour
 
     void setRespawnLocation()
     {
-        float rngPlace = Random.Range(0, 10);
-        if (rngPlace <=6f)
+        if (TeamManager.instance.team == 0)
         {
-            localPlayer.GetComponent<mainchar>().IsDef = false;
-            float rng = Random.Range(-5, 5);
-            localPlayer.transform.position = new Vector2(rng, 4f);
-        }
-        else
+            float rngPlace = Random.Range(0, 10);
+            if (rngPlace <= 6f)
+            {
+                localPlayer.GetComponent<mainchar>().IsDef = false;
+                float rng = Random.Range(-5, 5);
+                localPlayer.transform.position = new Vector2(rng, 4f);
+            }
+            else
+            {
+                localPlayer.GetComponent<mainchar>().IsDef = true;
+                localPlayer.transform.position = new Vector2(endingPoint.position.x + 3f, endingPoint.position.y - 2f);
+            }
+        }else if (TeamManager.instance.team == -1)
         {
-            localPlayer.GetComponent<mainchar>().IsDef = true;
-            localPlayer.transform.position = new Vector2(endingPoint.position.x+3f,endingPoint.position.y-2f);
+            localPlayer.transform.position = teamLBResPoint.transform.position;
+        }else if(TeamManager.instance.team == 1)
+        {
+            localPlayer.transform.position = teamRRResPoint.transform.position;
         }
-
         
     }
 

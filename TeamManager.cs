@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class TeamManager : MonoBehaviourPun
+public class TeamManager : MonoBehaviourPunCallbacks
 {
     public static TeamManager instance;
     public GameObject localPlayer;
@@ -69,6 +69,8 @@ public class TeamManager : MonoBehaviourPun
     {
         photonView.RPC("StartGame", RpcTarget.AllBuffered);
         photonView.RPC("SetCanF", RpcTarget.AllBuffered);
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.CurrentRoom.IsVisible = false;
     }
 
     //set openingCanvas False
@@ -80,18 +82,20 @@ public class TeamManager : MonoBehaviourPun
 
     [PunRPC]
     public void StartGame()
-    {
-        if (PhotonNetwork.IsMasterClient)
+    {    
+        if (team == -1)
         {
-            PhotonNetwork.JoinLobby(startGameLobby);
-            PhotonNetwork.CreateRoom(NotDes.instance.RoomName);
-            Debug.Log("ImMasterClient");
-            Debug.Log(NotDes.instance.RoomName);
-        }
-        else
+            this.localPlayer.transform.position = localPlayer.transform.position + new Vector3(-50f, 100f, 0);
+        }else if( team == 1)
         {
-            PhotonNetwork.JoinLobby(startGameLobby);
-            PhotonNetwork.JoinRoom(NotDes.instance.RoomName);
+            this.localPlayer.transform.position = localPlayer.transform.position + new Vector3(50f, 100f, 0);
         }
+        Debug.Log(localPlayer.name);
+
     }
+
+    //IEnumerator Wait()
+    //{
+    //    yield return new WaitForSeconds(0.1f);
+    //}
 }

@@ -13,11 +13,11 @@ public class menuManager : MonoBehaviourPunCallbacks
 
     [SerializeField] private GameObject CRBtn, JRBtn, NBtn;
 
-    [SerializeField] private InputField createRoomIF, joinRoomIF, nameIF;
+    [SerializeField] private InputField createRoomIF, joinRoomIF, nameIF,talkbox;
 
     [SerializeField] private Text playerListText;
 
-   
+    [SerializeField] private Transform talkListTran;
 
     public bool IsjoinBT;
     private TypedLobby BattleLobby = new TypedLobby("BTLobby",LobbyType.Default);
@@ -101,6 +101,8 @@ public class menuManager : MonoBehaviourPunCallbacks
 
     public void onclickStartGameBtn()
     {
+        PhotonNetwork.CurrentRoom.IsVisible = false;
+        PhotonNetwork.CurrentRoom.IsOpen = false;
         photonView.RPC("StartGame", RpcTarget.AllBuffered);
     }
 
@@ -149,7 +151,26 @@ public class menuManager : MonoBehaviourPunCallbacks
         IsjoinBT = false;
     }
 
-   
+    //talk
+    public void sendTalk()
+    {
+        
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            
+            GameObject obj = PhotonNetwork.Instantiate("TalkWordBox",new Vector3(0,0,0),Quaternion.identity);
+            
+            obj.transform.SetParent(talkListTran);
+            
+            obj.GetComponentInChildren<Text>().text = talkbox.text + "   by" +PhotonNetwork.NickName;
+            
+            talkbox.text = "";
+        }
+    }
 
-    
+    private void Update()
+    {
+        sendTalk();
+    }
+
 }

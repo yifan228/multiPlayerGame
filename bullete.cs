@@ -49,7 +49,7 @@ public class bullete : MonoBehaviourPun
     {
         if (!photonView.IsMine)
         {
-            gameObject.GetComponent<SpriteRenderer>().color = new Color(256, 0, 0);
+            gameObject.GetComponent<SpriteRenderer>().color = new Color(0,0,0);
         }
     }
 

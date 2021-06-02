@@ -52,7 +52,7 @@ public class health : MonoBehaviourPun,IPunObservable
         rb.isKinematic = true;
         sr.enabled = false;
         coll.enabled = false;
-        playercanvas.SetActive(false);
+        //playercanvas.SetActive(false); //死掉時還可以說話
        
     }
 
@@ -62,7 +62,7 @@ public class health : MonoBehaviourPun,IPunObservable
         rb.isKinematic = false;
         sr.enabled = true;
         coll.enabled = true ;
-        playercanvas.SetActive(true);
+        //playercanvas.SetActive(true);
         GameManager.instance.respawnUi.SetActive(false);
         GameManager.instance.startRespawn = false;
         fillImage.fillAmount = 1;

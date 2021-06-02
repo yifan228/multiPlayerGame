@@ -34,6 +34,8 @@ public class mainchar : MonoBehaviourPun,IPunObservable
     public bool DisableInputs = false;
 
     public AudioSource jumpSound;
+
+    public int teamNum;
     private void Start()
     {
         if (photonView.IsMine && TeamManager.instance.team ==0)
@@ -79,9 +81,9 @@ public class mainchar : MonoBehaviourPun,IPunObservable
             }
         }
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    //FixedUpdate
+    void FixedUpdate()
     {
         if (photonView.IsMine && DisableInputs==false)
         {
@@ -89,7 +91,8 @@ public class mainchar : MonoBehaviourPun,IPunObservable
             
             //playerCam.transform.position = new Vector3(target.transform.position.x, target.transform.position.y,-10f);
         }
-        
+        //let gameovertrigger know whose team win;
+        teamNum = TeamManager.instance.team; 
     }
 
     private void checkInputs()
