@@ -144,11 +144,29 @@ public class Throw : MonoBehaviourPun
     {
         gameObject.GetComponent<SpriteRenderer>().enabled = false;
     }
-
+    //改這裡應該就好
     public void shoot()
     {
-        GameObject newPoo = PhotonNetwork.Instantiate(Poo.name, shootPoint.position, shootPoint.rotation);
-        newPoo.GetComponent<Rigidbody2D>().velocity = transform.up * nowForce;
+        if (TeamManager.instance.team == 0)
+        {
+            GameObject newPoo = PhotonNetwork.Instantiate(Poo.name, shootPoint.position, shootPoint.rotation);
+            newPoo.GetComponent<Rigidbody2D>().velocity = transform.up * nowForce;
+        }
+        else if (GameManager.instance.localPlayer.GetComponent<mainchar>().Stat == "scissor")
+        {
+            GameObject newPoo = PhotonNetwork.Instantiate("Scissor", shootPoint.position, shootPoint.rotation);
+            newPoo.GetComponent<Rigidbody2D>().velocity = transform.up * nowForce;
+        }
+        else if(GameManager.instance.localPlayer.GetComponent<mainchar>().Stat == "stone")
+        {
+            GameObject newPoo = PhotonNetwork.Instantiate("Stone", shootPoint.position, shootPoint.rotation);
+            newPoo.GetComponent<Rigidbody2D>().velocity = transform.up * nowForce;
+        }
+        else if(GameManager.instance.localPlayer.GetComponent<mainchar>().Stat == "paper")
+        {
+            GameObject newPoo = PhotonNetwork.Instantiate("Paper", shootPoint.position, shootPoint.rotation);
+            newPoo.GetComponent<Rigidbody2D>().velocity = transform.up * nowForce;
+        }
     }
     public Vector2 pointPosition(float t)
     {

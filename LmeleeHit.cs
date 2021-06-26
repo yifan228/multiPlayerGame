@@ -8,18 +8,18 @@ public class LmeleeHit : MonoBehaviourPun
     public SpriteRenderer mainchaRSprite;
 
     public SpriteRenderer LHitRange;
-    [SerializeField]bool IsPlayer=false;
+    [SerializeField]bool IsPlayer;
     private Rigidbody2D otherPlayer;
 
     [SerializeField] private GameObject myplayerWeapon;
 
     private float hitCost=0.9f;
-    private float power = 150f;
+    private float power = 5f;
 
     private void OnTriggerStay2D(Collider2D collision)
     {
         //Debug.Log(collision.tag);
-        if (collision.tag == "Player" && !collision.GetComponent<PhotonView>().IsMine)
+        if (collision.tag == "Player" )
         {
             IsPlayer = true;
             otherPlayer = collision.GetComponent<Rigidbody2D>();
@@ -29,7 +29,7 @@ public class LmeleeHit : MonoBehaviourPun
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.tag == "Player" && collision.GetComponent<PhotonView>().IsMine == false)
+        if (collision.tag == "Player")
         {
             IsPlayer = false;
             otherPlayer = null;
@@ -69,12 +69,12 @@ public class LmeleeHit : MonoBehaviourPun
         
     }
 
-    private void CalculateForceAndHIt()
+    
+    private Vector2 CalculateVec2()
     {
         Vector2 vector = otherPlayer.transform.position - (this.transform.position + new Vector3(0.3f, 0f, 0f));
         Vector2 force = vector.normalized * power;
-        otherPlayer.GetComponent<PhotonView>().RPC("AdForce", RpcTarget.AllBuffered, force);
-        
+        return force;
     }
 
     private void Update()
@@ -85,9 +85,12 @@ public class LmeleeHit : MonoBehaviourPun
             photonView.RPC("TurnOnSprite", RpcTarget.AllBuffered);
             photonView.RPC("MainCharSpriteXTrue", RpcTarget.AllBuffered);
             photonView.RPC("SpellCostHit", RpcTarget.AllBuffered, hitCost);
+
             if (IsPlayer == true)
             {
-                CalculateForceAndHIt();
+                Vector2 vector2 = CalculateVec2();
+
+                otherPlayer.GetComponent<PhotonView>().RPC("BeHitten", RpcTarget.AllBuffered, vector2);
             }
             else { return; }
         }

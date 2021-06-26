@@ -23,7 +23,7 @@ public class bullete : MonoBehaviourPun
 
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
         if (!photonView.IsMine)
         {
@@ -45,7 +45,7 @@ public class bullete : MonoBehaviourPun
         }
         
     }
-    public void coloring()
+    protected virtual void Coloring()
     {
         if (!photonView.IsMine)
         {
@@ -59,7 +59,7 @@ public class bullete : MonoBehaviourPun
     }
     private void Update()
     {
-        coloring();
+        Coloring();
     }
 
 

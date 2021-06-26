@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
+//直接施力
 public class meleeHit : MonoBehaviourPun
 {
     public SpriteRenderer mainchaRSprite;
@@ -14,11 +15,13 @@ public class meleeHit : MonoBehaviourPun
     [SerializeField] private GameObject myplayerWeapon;
 
     private float hitCost=0.9f;
-    private float power = 150f;
+    private float power = 5f;
+
+    
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.tag == "Player" && collision.GetComponent<PhotonView>().IsMine == false)
+        if (collision.tag == "Player")
         {
             IsPlayer = true;
             otherPlayer = collision.GetComponent<Rigidbody2D>();
@@ -28,7 +31,7 @@ public class meleeHit : MonoBehaviourPun
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if(collision.tag =="Player" && collision.GetComponent<PhotonView>().IsMine == false)
+        if(collision.tag =="Player")
         {
             IsPlayer = false;
             otherPlayer = null;
@@ -48,11 +51,11 @@ public class meleeHit : MonoBehaviourPun
     }
 
     
-    private void CalculateForceAndHIt()
+    private Vector2 CalculateVec2()
     {
-        Vector2 vector = otherPlayer.transform.position - (this.transform.position - new Vector3(0.3f,0f,0f));
+        Vector2 vector = otherPlayer.transform.position - (this.transform.position - new Vector3(0.3f, 0f, 0f));
         Vector2 force = vector.normalized * power;
-        otherPlayer.GetComponent<PhotonView>().RPC("AdForce", RpcTarget.AllBuffered, force);
+        return force;
     }
 
     [PunRPC]
@@ -79,16 +82,19 @@ public class meleeHit : MonoBehaviourPun
         if (Input.GetKeyDown(KeyCode.E) && photonView.IsMine && myplayerWeapon.GetComponent<Throw>().spellAmount.fillAmount > hitCost)
         {
             //Debug.Log(this.transform.position);
+
             photonView.RPC("TurnOnSprite", RpcTarget.AllBuffered);
             photonView.RPC("MainCharSpriteXFalse", RpcTarget.AllBuffered);
-            photonView.RPC("SpellCostHit", RpcTarget.AllBuffered,hitCost);
+            photonView.RPC("SpellCostHit", RpcTarget.AllBuffered, hitCost);
+           
             if (IsPlayer == true)
             {
-                //Debug.Log(otherPlayer.transform.position);
-                //Debug.Log(otherPlayer.transform.position - (this.transform.position - new Vector3(0.3f, 0f, 0f)));
-                CalculateForceAndHIt();
+                Vector2 vector2 = CalculateVec2();
+                
+                otherPlayer.GetComponent<PhotonView>().RPC("BeHitten", RpcTarget.AllBuffered,vector2);
             }
             else { return; }
+            
         }
     }
 }

@@ -23,6 +23,4 @@ public class NotDes : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    // Update is called once per frame
-    
 }

@@ -71,7 +71,7 @@ public class health : MonoBehaviourPun,IPunObservable
     }
 
    [PunRPC]
-   public void HealthUpdate(float damage)
+   public void HealthUpdate(float damage)//子彈攻擊到的時候
     {
         fillImage.fillAmount -= damage;
 

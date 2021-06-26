@@ -15,10 +15,10 @@ public class GameOver : MonoBehaviourPun
 
     private void Awake()
     {
-        if (photonView.IsMine)
-        {
-            instance = this;
-        }
+        //if (photonView.IsMine)
+        //{
+        //    instance = this;
+        //}
     }
 
 

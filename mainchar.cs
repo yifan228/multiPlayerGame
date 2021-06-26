@@ -12,9 +12,19 @@ public class mainchar : MonoBehaviourPun,IPunObservable
     public BoxCollider2D IsRihgtWall;
     public BoxCollider2D IsLeftWall;
     public SpriteRenderer mainchaRSprite;
+    public GameObject Lit;
+    int LitOn=1;
 
     [SerializeField]
     public bool IsDef = false;//搞人的玩家
+    [Header("剪刀石頭布")]
+    public string Stat;//剪刀1石頭2布3
+    public Image StatImage;
+    public Sprite scissorsImg;
+    public Sprite stoneImg;
+    public Sprite paperImg;
+    bool CanChangeStat=true;
+    float countDownNum=3;
 
     //public int IsTeamBlueRedTeam = 0;//0 is not Team,1 is blue,-1 is red
     public Color myTeamColor;
@@ -36,6 +46,9 @@ public class mainchar : MonoBehaviourPun,IPunObservable
     public AudioSource jumpSound;
 
     public int teamNum;
+    [Header("魔法傳送門")]
+    public GameObject trandoor;//被打的時候生成的傳送門
+    Transform trDoorPos;
     private void Start()
     {
         if (photonView.IsMine && TeamManager.instance.team ==0)
@@ -46,7 +59,7 @@ public class mainchar : MonoBehaviourPun,IPunObservable
             playerName.text = PhotonNetwork.NickName;
             //playerMasterName = PhotonNetwork.NickName;
             playerCam.SetActive(true);
-            
+           
         }
         else if (photonView.IsMine && TeamManager.instance.team == -1)
         {
@@ -73,6 +86,7 @@ public class mainchar : MonoBehaviourPun,IPunObservable
         else if(!photonView.IsMine){
             if (TeamManager.instance.team == 0)
             {
+                //target.isKinematic = true;//ignore collide 
                 playerName.text = photonView.Owner.NickName;
                 playerName.color = Color.red;
             }else
@@ -81,7 +95,69 @@ public class mainchar : MonoBehaviourPun,IPunObservable
             }
         }
     }
+    //check?
+    private void Update()
+    {
+        if (TeamManager.instance.team != 0 && photonView.IsMine)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1) && CanChangeStat)
+            {
+                Stat = "scissor";
+                StatImage.sprite = scissorsImg;
+                CanChangeStat = false;
+                StartCoroutine(CountDown(true));
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2) && CanChangeStat)
+            {
+
+                Stat = "stone";
+                StatImage.sprite = stoneImg;
+                CanChangeStat = false;
+                StartCoroutine(CountDown(true));
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha3) && CanChangeStat)
+            {
+
+                Stat = "paper";
+                StatImage.sprite = paperImg;
+                CanChangeStat = false;
+                StartCoroutine(CountDown(true));
+            }
+        }
+
+        if(TeamManager.instance.team == 0)
+        {
+            if (Input.GetKeyDown(KeyCode.L)&&LitOn==1)
+            {
+                Lit.SetActive(true);
+                LitOn *= -1;
+            }else if(Input.GetKeyDown(KeyCode.L) && LitOn == -1)
+            {
+                Lit.SetActive(false);
+                LitOn *= -1;
+            }
+            
+        }
+
+    }
+
+    IEnumerator CountDown(bool count)
+    {
+        while (count)
+        {
+            countDownNum -= Time.deltaTime;
+            Debug.Log(countDownNum);
+            yield return null;
+            if (countDownNum <= 0)
+            {
+                CanChangeStat = true;
+                countDownNum = 3;
+                count =false;
+            }
+        }
+    }
     
+
     //FixedUpdate
     void FixedUpdate()
     {
@@ -94,6 +170,8 @@ public class mainchar : MonoBehaviourPun,IPunObservable
         //let gameovertrigger know whose team win;
         teamNum = TeamManager.instance.team; 
     }
+
+    
 
     private void checkInputs()
     {
@@ -212,13 +290,25 @@ public class mainchar : MonoBehaviourPun,IPunObservable
 
     
     [PunRPC]
-    public void AdForce(Vector2 force)
+    public void BeHitten(Vector2 addPosition)
     {
         if (photonView.IsMine)
         {
-            target.velocity = force;
+            Vector3 pos = new Vector3(target.transform.position.x+addPosition.x, target.transform.position.y + addPosition.y, target.transform.position.z);
+            StartCoroutine(Disapear());
+            trDoorPos.position = pos;
+            target.transform.position = pos;
         }
+
     }//using AddForce will render a wierd phenomanon,using velocity either
+
+    IEnumerator Disapear()
+    {
+        GameObject obj = Instantiate(trandoor, trDoorPos);
+        yield return null;
+        yield return new WaitForSeconds(1);
+        Destroy(obj);
+    }
 
     [PunRPC]
     public void JumpSoundPlay()
@@ -231,20 +321,22 @@ public class mainchar : MonoBehaviourPun,IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(IsDef);
-            if (TeamManager.instance.team != 0)
-            {
-                stream.SendNext(playerName.color);
-            }
+            //stream.SendNext(transform.position);
+            //if (TeamManager.instance.team != 0)
+            //{
+            //    stream.SendNext(playerName.color);
+            //}
             //stream.SendNext(playerMasterName);
 
         }
         else if (stream.IsReading)
         {
             IsDef = (bool)stream.ReceiveNext();
-            if (TeamManager.instance.team != 0)
-            {
-                playerName.color = (Color)stream.ReceiveNext();
-            }
+            //transform.position = (Vector3)stream.ReceiveNext();
+            //if (TeamManager.instance.team != 0)
+            //{
+            //    playerName.color = (Color)stream.ReceiveNext();
+            //}
             //playerMasterName = (string)stream.ReceiveNext();
         }
     }//to synchronize isdef value 用this會有問題？（待驗證）

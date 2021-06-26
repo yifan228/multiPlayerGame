@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Chat;
 using Photon.Realtime;
 
 public class menuManager : MonoBehaviourPunCallbacks
@@ -19,6 +20,10 @@ public class menuManager : MonoBehaviourPunCallbacks
 
     [SerializeField] private Transform talkListTran;
 
+    
+
+    public GameObject TalkBoxPref;
+
     public bool IsjoinBT;
     private TypedLobby BattleLobby = new TypedLobby("BTLobby",LobbyType.Default);
     private TypedLobby TeamLobby = new TypedLobby("TMLobby",LobbyType.Default);
@@ -30,8 +35,11 @@ public class menuManager : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
+        
+
         PhotonNetwork.ConnectUsingSettings();
         instance = this;
+        
     }
    
 
@@ -157,17 +165,20 @@ public class menuManager : MonoBehaviourPunCallbacks
         
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            
-            GameObject obj = PhotonNetwork.Instantiate("TalkWordBox",new Vector3(0,0,0),Quaternion.identity);
-            
-            obj.transform.SetParent(talkListTran);
-            
-            obj.GetComponentInChildren<Text>().text = talkbox.text + "   by" +PhotonNetwork.NickName;
-            
-            talkbox.text = "";
+            string text = talkbox.text+ "   by" + PhotonNetwork.NickName;
+            photonView.RPC("SetTalkBoxPosition", RpcTarget.AllBuffered,text);
         }
     }
+    [PunRPC] public void SetTalkBoxPosition(string text)
+    {
+        GameObject obj;//talkBox gameobject
+        obj =GameObject.Instantiate(TalkBoxPref, new Vector3(0, 0, 0), Quaternion.identity);
+        obj.transform.SetParent(talkListTran);
 
+        obj.GetComponentInChildren<Text>().text = text ;
+
+        talkbox.text = "";
+    }
     private void Update()
     {
         sendTalk();
