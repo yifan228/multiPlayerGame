@@ -10,25 +10,23 @@ public class GameOver : MonoBehaviourPun
     //public string winnerName;
 
     public static GameOver instance;
-    public bool AmIWinner;
+    public bool AmIWinner=false;
     public int WinTeam;
 
-    private void Awake()
+    public int num;
+    private void Start()
     {
-        //if (photonView.IsMine)
-        //{
-        //    instance = this;
-        //}
+            instance = this;   
     }
 
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (TeamManager.instance.team == 0)
+        if (collision.tag == "Player") //&& collision.GetComponent<mainchar>().IsDef == false)
         {
-            //Debug.Log(collision.GetComponent<mainchar>().IsDef);
-            if (collision.tag == "Player" && collision.GetComponent<mainchar>().IsDef == false)
+            if (TeamManager.instance.team == 0)
             {
+            //Debug.Log(collision.GetComponent<mainchar>().IsDef);
 
                 //Debug.Log(collision.GetComponent<mainchar>().playerMasterName);
                 //Debug.Log("Hahahaha");
@@ -44,22 +42,33 @@ public class GameOver : MonoBehaviourPun
                 if (collision.GetComponent<PhotonView>().IsMine)
                 {
                     AmIWinner = true;
-                    photonView.RPC("GameoverScene", RpcTarget.AllBuffered);
-                }
-                else { AmIWinner = false; }
 
-                DontDestroyOnLoad(this.gameObject);
-                Destroy(this.gameObject, 1.5f);
+                    photonView.RPC("SetWinner", RpcTarget.AllBuffered,PhotonNetwork.NickName);
+                    photonView.RPC("GameoverScene", RpcTarget.AllBuffered);
+
+                    DontDestroyOnLoad(this.gameObject);
+                    Destroy(this.gameObject, 1.5f);
+                }
+                
+
             }
             else 
             {
-                if(collision.tag =="Player"&&collision.GetComponent<mainchar>().teamNum == 1)
+                if(collision.tag =="Player"&&collision.name == "PlayerBattleBlue(Clone)"&&num==1)
                 {
-                    WinTeam = 1;
+                
+                    photonView.RPC("GameoverSceneTeamB", RpcTarget.AllBuffered);
+                    //要改！！！！！！！！！
+                    DontDestroyOnLoad(this.gameObject);
+                    Destroy(this.gameObject, 1.5f);
                 }
-                else if(collision.tag == "Player" && collision.GetComponent<mainchar>().teamNum == -1)
+                else if(collision.tag == "Player" && collision.name == "PlayerBattleRed(Clone)"&&num==-1)
                 {
-                    WinTeam = -1;
+            
+                    photonView.RPC("GameoverSceneTeamR", RpcTarget.AllBuffered);
+                    
+                    DontDestroyOnLoad(this.gameObject);
+                    Destroy(this.gameObject, 1.5f);
                 }
             }
         }
@@ -71,6 +80,23 @@ public class GameOver : MonoBehaviourPun
     {
         PhotonNetwork.LoadLevel("GameOver");
     }
+    [PunRPC]
+    public void SetWinner(string name)
+    {
+        NotDes.instance.WInName =name;
+    }
 
+    [PunRPC]
+    public void GameoverSceneTeamB()
+    {
+        NotDes.instance.WinTeam = -1;
+        PhotonNetwork.LoadLevel("Team");
+    }
 
+    [PunRPC]
+    public void GameoverSceneTeamR()
+    {
+        NotDes.instance.WinTeam = 1;
+        PhotonNetwork.LoadLevel("Team");
+    }
 }

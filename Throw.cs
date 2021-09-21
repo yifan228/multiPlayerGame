@@ -24,7 +24,8 @@ public class Throw : MonoBehaviourPun
 
     public static Throw instance;
 
-    public bool talking = false;
+    public bool talking ;
+    public bool CanThrow;
 
     bool instantiatePoint;
 
@@ -38,12 +39,15 @@ public class Throw : MonoBehaviourPun
     [Header("shootSound")]
     public AudioSource shootSound;
 
-    private void Awake()
-    {
-        instance = this;
-    }
+    //private void Awake()
+    //{
+        
+    //}
     void Start()
     {
+        instance = this;
+        talking = false;
+        CanThrow = true;
         //points = new GameObject[numberOfPoints];
         //for (int i = 0; i < numberOfPoints; i++)
         //{
@@ -56,15 +60,15 @@ public class Throw : MonoBehaviourPun
     // Update is called once per frame
     void Update()
     {
-
+        SpellBarUpdateAutoRestore();
         Vector2 bowPosition = playercamera.ScreenToWorldPoint(shootPoint.position);
         Vector2 mousePosition = playercamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0.1f));
         direction = mousePosition - bowPosition;
         transform.up = direction;
 
-        if (photonView.IsMine && !talking)
+        if (photonView.IsMine && !talking && CanThrow)
         {
-            photonView.RPC("SpellBarUpdateAutoRestore", RpcTarget.AllBuffered);
+            //photonView.RPC("SpellBarUpdateAutoRestore", RpcTarget.AllBuffered);
             if (spellAmount.fillAmount >= spellCost)
             {
                 if (Input.GetMouseButtonDown(1))
@@ -149,8 +153,11 @@ public class Throw : MonoBehaviourPun
     {
         if (TeamManager.instance.team == 0)
         {
-            GameObject newPoo = PhotonNetwork.Instantiate(Poo.name, shootPoint.position, shootPoint.rotation);
-            newPoo.GetComponent<Rigidbody2D>().velocity = transform.up * nowForce;
+            if (gameObject.GetComponentInParent<health>().Isalive)
+            {
+                GameObject newPoo = PhotonNetwork.Instantiate(Poo.name, shootPoint.position, shootPoint.rotation);
+                newPoo.GetComponent<Rigidbody2D>().velocity = transform.up * nowForce;
+            }
         }
         else if (GameManager.instance.localPlayer.GetComponent<mainchar>().Stat == "scissor")
         {
@@ -194,20 +201,20 @@ public class Throw : MonoBehaviourPun
     //    gameObject.GetComponent<SpriteRenderer>().enabled = false;
     //}
 
-    [PunRPC]
+    //[PunRPC]
     public void SpellBarUpdateAutoRestore()
     {
-        if (photonView != null)
-        {
+        //if (photonView != null)
+        
             if (spellAmount.fillAmount < 1f)
             {
-                spellAmount.fillAmount += 0.3f * Time.deltaTime;
+                spellAmount.fillAmount += 0.2f * Time.deltaTime;
             }
             else
             {
                 spellAmount.fillAmount = 1f;
             }
-        }
+        
     }
 
     [PunRPC]

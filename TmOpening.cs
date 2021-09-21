@@ -15,7 +15,7 @@ public class TmOpening : MonoBehaviour
 
     private void Start()
     {
-        Invoke("Set", 8f);
+        Invoke("Set", 1f);
         
     }
 
@@ -31,13 +31,13 @@ public class TmOpening : MonoBehaviour
         }
     }
 
-    public void setMus()
-    {
-        music.SetActive(true);
-    }
+    //public void setMus()
+    //{
+    //    music.SetActive(true);
+    //}
 
-    public void setMusF()
-    {
-        music.SetActive(false);
-    }
+    //public void setMusF()
+    //{
+    //    music.SetActive(false);
+    //}
 }

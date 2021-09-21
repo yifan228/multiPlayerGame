@@ -12,14 +12,17 @@ public class TeamGameOverManager : MonoBehaviour
     {
         LBTeam.SetActive(false);
         RRteam.SetActive(false);
-        if(GameOver.instance.WinTeam == 1)
+        if (NotDes.instance.WinTeam == 1)
         {
             RRteam.SetActive(true);
-        }else if(GameOver.instance.WinTeam == -1)
+        }
+        else if (NotDes.instance.WinTeam == -1)
         {
             LBTeam.SetActive(true);
         }
     }
+
+    
 
     public void LeaveBtn()
     {

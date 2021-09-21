@@ -19,7 +19,7 @@ public class meleeHit : MonoBehaviourPun
 
     
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Player")
         {
@@ -91,7 +91,7 @@ public class meleeHit : MonoBehaviourPun
             {
                 Vector2 vector2 = CalculateVec2();
                 
-                otherPlayer.GetComponent<PhotonView>().RPC("BeHitten", RpcTarget.AllBuffered,vector2);
+                otherPlayer.GetComponent<mainchar>().photonView.RPC("BeHitten", RpcTarget.AllBuffered,vector2);
             }
             else { return; }
             

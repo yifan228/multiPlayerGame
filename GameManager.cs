@@ -23,9 +23,10 @@ public class GameManager : MonoBehaviourPun
 
     public float timeAmount = 0;
     public bool startRespawn;
-    public static GameManager instance = null;
-
+    public static GameManager instance;
+    [Header("statCanvas")]
     public GameObject statsCanvas;
+    [SerializeField] GameObject IllustrateCanvas;
     public int assistNum = 1;
 
     public Transform endingPoint;
@@ -38,8 +39,31 @@ public class GameManager : MonoBehaviourPun
     public GameObject teamRRResPoint;
     public GameObject teamLBResPoint;
 
+    
     int myPos, FstPos, SecPos, ThddPos;
+    private string TransFormyPos(int num)
+    {
+        switch (num)
+        {
+            case 0:
+                return "森屎界";
+            case 1:
+                return "地屎界";
+            case 2:
+                return "隱屎界";
+            case 3:
+                return "風屎界";
+            case 4:
+                return "宇宙界";
+            case 5:
+                return "冰屎界";
+            
+            default:
+                return "";
+        }
+    }//transform mypos to string
 
+    [Header("Battle")]
     public Transform endingStageEntrance;
 
     int[] myWay;
@@ -69,30 +93,36 @@ public class GameManager : MonoBehaviourPun
         d.text = "D人數：" + $"{D}";
         e.text = "E人數：" + $"{E}";
         f.text = "F人數：" + $"{F}";
-        nowStep.text = $"{ myWayIndex}";
     }
 
+    int lastPositionNum;
     private int NextPos(int x)
     {
         int y = Random.Range(0, 6);
-        while (x == y || (x + y) % 6 == 2 || (x + y) % 6 == 4 || (x + y) % 6 == 0)
+        while (x == y || (x + y) % 6 == 2 || (x + y) % 6 == 4 || (x + y) % 6 == 0||y==lastPositionNum)
         {
             y = Random.Range(0, 6);
         }
+        lastPositionNum = x;
         return y;
     }
 
-    private void Awake()
+    //這裡不能用awake不然這個程式會隱藏，應該是stepmap還沒實例
+    private void Start()
     {
         
         instance = this;
+        
         canvas.SetActive(true);
-        myPos = 0;//目前在a
-        FstPos = NextPos(myPos);
-        SecPos = NextPos(FstPos);
-        ThddPos = NextPos(SecPos);
-        myWay = new int[] { FstPos, SecPos, ThddPos };
-        stepMap.text = $"{myWay[0]}"+ $"{myWay[1]}"+ $"{myWay[2]}";
+        if (TeamManager.instance.team == 0)
+        {
+            myPos = 0;//目前在a
+            FstPos = NextPos(myPos);
+            SecPos = NextPos(FstPos);
+            ThddPos = NextPos(SecPos);
+            myWay = new int[] { FstPos, SecPos, ThddPos };
+            stepMap.text = "第一我要："+"從森屎界到達"+TransFormyPos(myWay[0]) + "\n" +"第二我要：" + $"從{TransFormyPos(myWay[0])}到達" + TransFormyPos(myWay[1]) +"\n"+ "第三我要：" + $"從{TransFormyPos(myWay[1])}到達" + TransFormyPos(myWay[2]);
+        }
         //Debug.Log(myPos);
         //Debug.Log(FstPos);
         //Debug.Log(SecPos);
@@ -101,38 +131,45 @@ public class GameManager : MonoBehaviourPun
 
     private void Update()
     {
-        
         Pin.text = " Ping:" + PhotonNetwork.GetPing();
-
-        if (Input.GetKeyDown(KeyCode.H)&&TeamManager.instance.team ==0)
+        if (TeamManager.instance.team == 0 && myWayIndex < 3 &&nowStep!=null)
         {
-            photonView.RPC("SetBH", RpcTarget.AllBuffered);
-  
+            nowStep.text = "通過門的次數：" + $"{ myWayIndex }";
+        }else if (TeamManager.instance.team == 0 && myWayIndex == 3 &&nowStep!=null)
+        {
+            nowStep.text = "目前位置：" + "痣慧之窟";
         }
-        if (AmIWin)
+        //if (Input.GetKeyDown(KeyCode.H) && TeamManager.instance.team == 0)
+        //{
+        //    photonView.RPC("SetBH", RpcTarget.AllBuffered);
+
+            //}
+        if ( AmIWin&&TeamManager.instance.team==0)
         {
             localPlayer.transform.position = endingStageEntrance.position;
             RespawnPoint.transform.position = endingStageEntrance.position;
             AmIWin = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            FindAllPlayer();
-        }// count player in each island
+        //if (Input.GetKeyDown(KeyCode.C) && TeamManager.instance.team == 0)
+        //{
+        //    FindAllPlayer();
+        //}// count player in each island
 
-        fillAmountText();//show num of player in ui
+        //if(TeamManager.instance.team==0)
+        //    fillAmountText();//show num of player in ui
 
         if (startRespawn)
         {
             StartRespawn();
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape)&&assistNum ==1)
+        if (Input.GetKeyDown(KeyCode.Escape) && assistNum == 1)
         {
             statsCanvas.SetActive(true);
             assistNum = assistNum * -1;
-        } else if (Input.GetKeyDown(KeyCode.Escape)&&assistNum==-1)
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape) && assistNum == -1)
         {
             statsCanvas.SetActive(false);
             assistNum = assistNum * -1;
@@ -151,7 +188,8 @@ public class GameManager : MonoBehaviourPun
             localPlayer.GetComponent<mainchar>().DisableInputs = false;
             localPlayer.GetComponent<PhotonView>().RPC("Revive", RpcTarget.AllBuffered);
             setRespawnLocation();
-            
+            localPlayer.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+            localPlayer.GetComponentInChildren<Throw>().CanThrow = true;//能丟
         }
     }
 
@@ -160,15 +198,19 @@ public class GameManager : MonoBehaviourPun
         timeAmount = 5;
         respawnUi.SetActive(true);
         startRespawn = true;
+        if (TeamManager.instance.team != 0)
+        {
+            localPlayer.GetComponentInChildren<Throw>().CanThrow = false;//不能丟東西
+        }
     }
 
     public void spawnPlayer()
     {
         float randomValue = Random.Range(-1, 1);
-        PhotonNetwork.Instantiate("Player",new Vector2(AspawnPoint.transform.position.x*randomValue,AspawnPoint.transform.position.y),Quaternion.identity,0);
+        PhotonNetwork.Instantiate("Player",new Vector2(AspawnPoint.transform.position.x+randomValue,AspawnPoint.transform.position.y),Quaternion.identity,0);
         canvas.SetActive(false);
         sceneCam.SetActive(false);
-        //photonView.RPC("APlus", RpcTarget.AllBuffered);
+        
         RespawnPoint.transform.position = AspawnPoint.transform.position;
     }
 
@@ -180,15 +222,14 @@ public class GameManager : MonoBehaviourPun
             float rngPlace = Random.Range(0, 10);
             if (rngPlace <= 10f)
             {
-                localPlayer.GetComponent<mainchar>().IsDef = false;
+                //localPlayer.GetComponent<mainchar>().IsDef = false;
                 float rng = Random.Range(-1, 1);
                 localPlayer.transform.position = RespawnPoint.transform.position;//
-                photonView.RPC("APlus", RpcTarget.AllBuffered);//
             }
             else
             {
-                localPlayer.GetComponent<mainchar>().IsDef = true;
-                localPlayer.transform.position = new Vector2(endingPoint.position.x + 3f, endingPoint.position.y - 2f);
+                //localPlayer.GetComponent<mainchar>().IsDef = true;
+                localPlayer.transform.position = new Vector2(endingPoint.position.x, endingPoint.position.y);
             }
         }else if (TeamManager.instance.team == -1)
         {
@@ -211,6 +252,16 @@ public class GameManager : MonoBehaviourPun
     public void BackToGame()
     {
         statsCanvas.SetActive(false);
+    }
+
+    public void ClickIllustrateBtn()
+    {
+        IllustrateCanvas.SetActive(true);
+    }
+
+    public void BackToStat1()
+    {
+        IllustrateCanvas.SetActive(false);
     }
 
     [PunRPC]

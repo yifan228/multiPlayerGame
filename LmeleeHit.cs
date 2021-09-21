@@ -16,7 +16,7 @@ public class LmeleeHit : MonoBehaviourPun
     private float hitCost=0.9f;
     private float power = 5f;
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         //Debug.Log(collision.tag);
         if (collision.tag == "Player" )
@@ -90,7 +90,7 @@ public class LmeleeHit : MonoBehaviourPun
             {
                 Vector2 vector2 = CalculateVec2();
 
-                otherPlayer.GetComponent<PhotonView>().RPC("BeHitten", RpcTarget.AllBuffered, vector2);
+                otherPlayer.GetComponent<mainchar>().photonView.RPC("BeHitten", RpcTarget.AllBuffered, vector2);
             }
             else { return; }
         }

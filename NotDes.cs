@@ -8,6 +8,8 @@ public class NotDes : MonoBehaviour
     public string RoomName;
     public string MyName;
     public int myTeam;
+    public string WInName;
+    public int WinTeam;
     // Start is called before the first frame update
     void Awake()
     {

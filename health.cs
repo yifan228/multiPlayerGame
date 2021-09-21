@@ -4,8 +4,9 @@ using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
 
-public class health : MonoBehaviourPun,IPunObservable
+public class health : MonoBehaviourPun  
 {
+    public bool Isalive=true;
     public Image fillImage;
 
     public float Hp = 1;
@@ -13,6 +14,7 @@ public class health : MonoBehaviourPun,IPunObservable
     public Rigidbody2D rb;
     public SpriteRenderer sr;
     public BoxCollider2D coll;
+    public ParticleSystem particle;
 
     public GameObject playercanvas;
     
@@ -22,12 +24,12 @@ public class health : MonoBehaviourPun,IPunObservable
         if (photonView.IsMine && Hp <= 0)
         {
             photonView.RPC("Death", RpcTarget.AllBuffered);
-            gameObject.GetComponent<mainchar>().DisableInputs = true;
+            GameManager.instance.localPlayer.GetComponent<mainchar>().DisableInputs = true;
             GameManager.instance.enableRespawn();
-
+            
         }
     }
-    #region test
+    
     //void aa()
     //{
     //    if (Input.GetKey(KeyCode.G))
@@ -45,13 +47,16 @@ public class health : MonoBehaviourPun,IPunObservable
     //{
     //    aa();
     //}
-    #endregion
+    
     [PunRPC]
     public void Death()
     {
         rb.isKinematic = true;
         sr.enabled = false;
         coll.enabled = false;
+        Isalive = false;
+        particle.Play();
+        //can't throw
         //playercanvas.SetActive(false); //死掉時還可以說話
        
     }
@@ -67,19 +72,27 @@ public class health : MonoBehaviourPun,IPunObservable
         GameManager.instance.startRespawn = false;
         fillImage.fillAmount = 1;
         Hp = 1f;
-        
+        Isalive = true;
     }
 
    [PunRPC]
    public void HealthUpdate(float damage)//子彈攻擊到的時候
     {
-        fillImage.fillAmount -= damage;
-
-        Hp = fillImage.fillAmount;
-        checkHp();
+        if (Hp >= 0)
+        {
+            Hp -= damage;
+            //checkHp();
+        }
     }
     private void Update()
     {
+        fillImage.fillAmount = Hp;
+
+        if (Isalive)
+        {
+            checkHp();
+        }
+        
         if (Hp < 1f && Hp > 0)
         {
             Hp += 0.1f * Time.deltaTime;
@@ -89,18 +102,7 @@ public class health : MonoBehaviourPun,IPunObservable
             }
         }
 
-        fillImage.fillAmount = Hp; 
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(Hp);
-
-        }else if (stream.IsReading)
-        {
-            this.Hp = (float)stream.ReceiveNext();
-        }
-    }
+    
 }

@@ -112,7 +112,7 @@ public class batSystem : MonoBehaviourPun
 
     private void Update()
     {
-        if (photonView.IsMine)
+        if (photonView.IsMine&&TeamManager.instance.team==0)
         {
             if (Input.GetMouseButton(0))
             {

@@ -8,7 +8,7 @@ using Photon.Realtime;
 
 public class menuManager : MonoBehaviourPunCallbacks
 {
-    public static menuManager instance;
+    //public static menuManager instance;
 
     [SerializeField] private GameObject nameSpace, roomSpace, playerListScreen,BtListScreen;
 
@@ -25,20 +25,21 @@ public class menuManager : MonoBehaviourPunCallbacks
     public GameObject TalkBoxPref;
 
     public bool IsjoinBT;
-    private TypedLobby BattleLobby = new TypedLobby("BTLobby",LobbyType.Default);
-    private TypedLobby TeamLobby = new TypedLobby("TMLobby",LobbyType.Default);
+    [HideInInspector]public TypedLobby BattleLobby = new TypedLobby("BTLobby",LobbyType.Default);
+    [HideInInspector]public TypedLobby TeamLobby = new TypedLobby("TMLobby",LobbyType.Default);
 
     
 
     public Button startGameBtn;
     //public string Myname;
 
-    private void Awake()
+    private void Start()
     {
         
 
         PhotonNetwork.ConnectUsingSettings();
-        instance = this;
+        PhotonNetwork.JoinLobby(default);
+        //instance = this;
         
     }
    
@@ -49,12 +50,12 @@ public class menuManager : MonoBehaviourPunCallbacks
         nameSpace.SetActive(true);
         //PhotonNetwork.JoinLobby();
     }
-    //public override void OnJoinedLobby()
-    //{
-    //    Debug.Log("connected to lobby");
-    //    nameSpace.SetActive(true);
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("connected to lobby");
+        //nameSpace.SetActive(true);
 
-    //}
+    }
 
     public override void OnJoinedRoom()
     {
@@ -75,8 +76,11 @@ public class menuManager : MonoBehaviourPunCallbacks
     
     public void Onclick_CreateRoomBtn()
     {
-        NotDes.instance.RoomName = createRoomIF.text;
-        PhotonNetwork.CreateRoom(createRoomIF.text);
+        if (createRoomIF.text != "")
+        { 
+            NotDes.instance.RoomName = createRoomIF.text;
+            PhotonNetwork.CreateRoom(createRoomIF.text);
+        }
     }
 
     public void Onclick_JoinRoom()
@@ -91,12 +95,17 @@ public class menuManager : MonoBehaviourPunCallbacks
     //join battle mode
     public void Name()
     {
-        PhotonNetwork.NickName = nameIF.text;
-        NotDes.instance.MyName = nameIF.text;
-        nameSpace.SetActive(false);
-        roomSpace.SetActive(true);
-        PhotonNetwork.JoinLobby(BattleLobby);
-        IsjoinBT = true;
+        if (nameIF.text != "")
+        {
+            PhotonNetwork.NickName = nameIF.text;
+            NotDes.instance.MyName = nameIF.text;
+            NotDes.instance.myTeam = 0;
+            nameSpace.SetActive(false);
+            roomSpace.SetActive(true);
+            PhotonNetwork.JoinLobby(BattleLobby);
+            IsjoinBT = true;
+
+        }
         //Myname = nameIF.text;
     }
     public void onNameFieldChange()
@@ -118,7 +127,11 @@ public class menuManager : MonoBehaviourPunCallbacks
     public void StartGame()
     {
         PhotonNetwork.LoadLevel(1);
+        //TeamManager.instance.team = 0;
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.CurrentRoom.IsVisible = false;
     }
+    
 
     public void onclickLeaveBtn()
     {
@@ -151,12 +164,16 @@ public class menuManager : MonoBehaviourPunCallbacks
     //to join team mode
     public void ToJoinTeamLobby()
     {
-        PhotonNetwork.NickName = nameIF.text;
-        NotDes.instance.MyName = nameIF.text;
-        nameSpace.SetActive(false);
-        roomSpace.SetActive(true);
-        PhotonNetwork.JoinLobby(TeamLobby);
-        IsjoinBT = false;
+        if (nameIF.text !="")
+        {
+            PhotonNetwork.NickName = nameIF.text;
+            NotDes.instance.MyName = nameIF.text;
+            nameSpace.SetActive(false);
+            roomSpace.SetActive(true);
+            PhotonNetwork.JoinLobby(TeamLobby);
+            IsjoinBT = false;
+        }
+        //TeamManager.instance.team = 1;//先預設是紅對
     }
 
     //talk
@@ -165,7 +182,7 @@ public class menuManager : MonoBehaviourPunCallbacks
         
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            string text = talkbox.text+ "   by" + PhotonNetwork.NickName;
+            string text = talkbox.text+ "   by  " + PhotonNetwork.NickName;
             photonView.RPC("SetTalkBoxPosition", RpcTarget.AllBuffered,text);
         }
     }
@@ -174,7 +191,7 @@ public class menuManager : MonoBehaviourPunCallbacks
         GameObject obj;//talkBox gameobject
         obj =GameObject.Instantiate(TalkBoxPref, new Vector3(0, 0, 0), Quaternion.identity);
         obj.transform.SetParent(talkListTran);
-
+        obj.GetComponent<RectTransform>().localScale =new Vector3(1,1,1) ;
         obj.GetComponentInChildren<Text>().text = text ;
 
         talkbox.text = "";
